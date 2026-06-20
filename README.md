@@ -4,10 +4,13 @@ A Docker-based sandbox environment for running AI agents.
 
 ## Agents
 
-| Agent                                                  | Description                                       | Notes                              |
-| ------------------------------------------------------ | ------------------------------------------------- | ---------------------------------- |
-| [Hermes Agent](https://hermes-agent.nousresearch.com/) | NousResearch's general-purpose agent              | Install is large and takes a while |
-| [Devin CLI](https://cli.devin.ai/)                     | Cognition's autonomous software engineering agent | Lightweight install                |
+All CLIs listed below offer usable free plans.
+
+| Agent                                                  | Description                                                                 | Notes                              |
+| ------------------------------------------------------ | --------------------------------------------------------------------------- | ---------------------------------- |
+| [Hermes Agent](https://hermes-agent.nousresearch.com/) | Free models via API with [OpenRouter](https://openrouter.ai) or [Nvidia](https://build.nvidia.com) | Install is large and takes a while |
+| [Cline](https://cline.bot/)                             | Offers a free plan with decent LLM models                                   | Lightweight install                |
+| [Devin CLI](https://cli.devin.ai/)                     | Offers free plan with decent LLM model                                      | Lightweight install                |
 
 ## Prerequisites
 
@@ -22,12 +25,19 @@ Build the Docker image from the root of the repository:
 docker compose build
 ```
 
+Or use the helper script:
+
+```bash
+./scripts/build.sh        # Bash
+.\scripts\build.ps1       # PowerShell
+```
+
 This will:
 1. Start from a `python:3-slim-trixie` base image
 2. Install required system packages (`ca-certificates`, `curl`, `git`, `bash`, `xz-utils`, `tar`)
 3. Install `yq` for reading YAML config
 4. Copy `scripts/installer.sh` and `config.yml`
-5. Run `installer.sh`, which conditionally installs tools marked as `true` in `config.yml`
+5. Run `installer.sh`, which installs all tools listed under `install:` in `config.yml`
 6. Set up the PATH to include installed binaries
 
 ## Running
@@ -36,6 +46,13 @@ Start an interactive shell inside the sandbox container:
 
 ```bash
 docker compose run --rm sandbox
+```
+
+Or use the helper script:
+
+```bash
+./scripts/run.sh          # Bash
+.\scripts\run.ps1         # PowerShell
 ```
 
 Or, for a persistent TTY session:
@@ -80,16 +97,20 @@ simple-agent-sandbox
 
 - The `./persist` directory is gitignored and should not be committed.
 - The container runs `bash` by default, providing an interactive shell.
-- Tool installation is driven by `config.yml`. Set entries under `install:` to `true` to include a tool at build time.
-- The `scripts/installer.sh` script reads `config.yml` via `yq` and conditionally installs Hermes Agent and/or Devin CLI.
+- Tool installation is driven by `config.yml`. Each key under `install:` maps directly to its install command string.
+- The `scripts/installer.sh` script reads `config.yml` via `yq` and runs each install command listed.
 
 ### Configuration
 
 Edit `config.yml` to enable or disable tools:
 
+- Comment out undesired apps
+
 ```yaml
-# Install list — set a tool to true to install it at build time
+# Install list — each key maps to its install command
 install:
-  hermes: false  # Hermes agent by NousResearch
-  devin: true   # Devin CLI by Cognition
+  tool-name: "command to install the tool"
+  # undesired-tool: "skip this one"
+  another-tool: "another install command"
+
 ```

@@ -7,10 +7,21 @@ if [ -x /usr/bin/dircolors ]; then
     alias grep='grep --color=auto'
 fi
 
-# Common aliases
-alias ll='ls -alF'
-alias la='ls -a'
-alias l='ls -CF'
 
+
+alias histfind="history | grep --color=always --ignore-case"
+alias t="tail -f"
+alias l="less"
+alias topu="top -u $USER"
+alias ll="ls -lha"
+alias la="ls -a"
+alias ld="ls -d"
+alias lt="ls -lhatr"
+function f {
+    devnullredirect find . -iname $@
+}
+
+alias uv-tests="source .venv/bin/activate; uv sync --dev; ruff format; ruff check --fix; pytest --cov=myproj --cov-report term-missing; mypy ."
+alias venv-here="[ ! -d .venv ] && uv venv; source .venv/bin/activate"
 
 echo "Welcome to the Simple Agent Sandbox!"

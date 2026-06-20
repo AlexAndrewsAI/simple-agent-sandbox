@@ -1,4 +1,5 @@
-# Install list — set a tool to true to install it at build time
+# Install list — each key maps to its install command
 install:
-  hermes: true  # Hermes agent by NousResearch
-  devin: true   # Devin CLI by Cognition
+  hermes: "curl -fsSL https://hermes-agent.nousresearch.com/install.sh -o /tmp/hermes_install.sh && bash /tmp/hermes_install.sh && rm -f /tmp/hermes_install.sh"
+  devin: "curl -fsSL https://cli.devin.ai/install.sh -o /tmp/devin_install.sh && bash /tmp/devin_install.sh || echo 'Devin install script exited non-zero (interactive login not possible in build); binary may still be present' && rm -f /tmp/devin_install.sh"
+  cline: "npm install -g cline"
