@@ -1,5 +1,5 @@
 # Install list — each key maps to its install command
 install:
-  hermes: "curl -fsSL https://hermes-agent.nousresearch.com/install.sh -o /tmp/hermes_install.sh && bash /tmp/hermes_install.sh && rm -f /tmp/hermes_install.sh"
+  hermes: "curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh  -o /tmp/hermes_install.sh && bash /tmp/hermes_install.sh && rm -f /tmp/hermes_install.sh"
   devin: "curl -fsSL https://cli.devin.ai/install.sh -o /tmp/devin_install.sh && bash /tmp/devin_install.sh || echo 'Devin install script exited non-zero (interactive login not possible in build); binary may still be present' && rm -f /tmp/devin_install.sh"
-  cline: "npm install -g cline"
+  cline: "bun install -g cline"
