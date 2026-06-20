@@ -2,6 +2,7 @@
 # installer.sh - Conditional tool installer driven by config.yml
 # Reads /tmp/config.yml using yq and installs all tools listed under install.<key>.
 set -euo pipefail
+set -x
 
 # Count of install entries
 count=$(yq '.install | length' /tmp/config.yml)

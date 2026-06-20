@@ -28,8 +28,8 @@ docker compose build
 Or use the helper script:
 
 ```bash
-./scripts/build.sh        # Bash
-.\scripts\build.ps1       # PowerShell
+./scripts/build.sh        # Bash (uses --progress=plain for visible output)
+.\scripts\build.ps1       # PowerShell (uses --progress=plain for visible output)
 ```
 
 This will:
