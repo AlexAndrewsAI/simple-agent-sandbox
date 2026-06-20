@@ -1,1 +1,3 @@
-/persist
+# Doon't commit persist except for specific files
+/persist/*
+!/persist/.bashrc
