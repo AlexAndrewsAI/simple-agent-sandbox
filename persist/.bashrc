@@ -9,7 +9,7 @@ fi
 
 # Common aliases
 alias ll='ls -alF'
-alias la='ls -A'
+alias la='ls -a'
 alias l='ls -CF'
 
 
