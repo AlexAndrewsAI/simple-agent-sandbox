@@ -3,7 +3,7 @@ services:
     build: .
     environment:
       - HOME=/persist
-      - PATH=/persist/.local/bin:$PATH
+      - PATH=/persist/.local/bin:/root/.local/bin:/usr/local/bin:$PATH
     volumes:
       - ./persist:/persist
     tty: true

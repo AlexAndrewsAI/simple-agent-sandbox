@@ -1,0 +1,4 @@
+# Install list — set a tool to true to install it at build time
+install:
+  hermes: true  # Hermes agent by NousResearch
+  devin: true   # Devin CLI by Cognition
