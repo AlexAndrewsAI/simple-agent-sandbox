@@ -1,0 +1,10 @@
+services:
+  sandbox:
+    build: .
+    environment:
+      - HOME=/persist
+      - PATH=/persist/.local/bin:$PATH
+    volumes:
+      - ./persist:/persist
+    tty: true
+    stdin_open: true
