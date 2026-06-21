@@ -9,7 +9,7 @@ All CLIs listed below offer usable free plans.
 | Agent                                                  | Description                                                                 | Notes                              |
 | ------------------------------------------------------ | --------------------------------------------------------------------------- | ---------------------------------- |
 | [Hermes Agent](https://hermes-agent.nousresearch.com/) | Free models via API with [OpenRouter](https://openrouter.ai) or [Nvidia](https://build.nvidia.com) | Install is large and takes a while |
-| [Cline](https://cline.bot/)                             | Offers a free plan with decent LLM models                                   | Lightweight install                |
+| [Cline](https://cline.bot/)                             | Offers a free plan with decent LLM models                                   | Heavy install               |
 | [Devin CLI](https://cli.devin.ai/)                     | Offers free plan with decent LLM model                                      | Lightweight install                |
 
 ## Prerequisites

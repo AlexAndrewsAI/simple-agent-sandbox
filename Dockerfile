@@ -19,7 +19,7 @@ RUN groupadd --gid ${USER_GID} sandbox \
   && useradd --uid ${USER_UID} --gid ${USER_GID} --create-home --shell /bin/bash sandbox
 
 COPY scripts/installer.sh /usr/local/bin/installer.sh
-COPY config.yml /tmp/config.yml
+COPY config.example.yml /tmp/config.yml
 
 RUN chmod +x /usr/local/bin/installer.sh && installer.sh
 
