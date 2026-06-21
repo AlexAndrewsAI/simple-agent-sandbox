@@ -1,3 +1,6 @@
 # Doon't commit persist except for specific files
 /persist/*
 !/persist/.bashrc
+
+# Don't commit actual config, use config.example.yml as template
+/config.yml
