@@ -4,6 +4,10 @@
 set -euo pipefail
 set -x
 
+# Ensure ~/.local/bin is on PATH so newly-installed binaries are visible
+# to the `command -v` fallback check below.
+export PATH="$HOME/.local/bin:$PATH"
+
 # Count of install entries
 count=$(yq '.install | length' /tmp/config.yml)
 
