@@ -42,6 +42,4 @@ RUN installer.sh
 
 ENV PATH="/persist/.npm-global/bin:/persist/.local/bin:/home/sandbox/.local/bin:/root/.local/bin:/root/.bun/bin:/usr/local/bin:${PATH}"
 
-RUN chown -R sandbox:sandbox /root
-
 CMD ["bash"]
