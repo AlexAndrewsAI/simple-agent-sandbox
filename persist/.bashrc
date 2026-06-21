@@ -17,6 +17,10 @@ alias ll="ls -lha"
 alias la="ls -a"
 alias ld="ls -d"
 alias lt="ls -lhatr"
+devnullredirect () {
+    echo "$@ 2>/dev/null"
+    "$@" 2>/dev/null
+}
 function f {
     devnullredirect find . -iname $@
 }

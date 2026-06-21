@@ -1,6 +1,10 @@
 services:
   sandbox:
-    build: .
+    build:
+      context: .
+      args:
+        USER_UID: ${UID:-1000}
+        USER_GID: ${GID:-1000}
     environment:
       - HOME=/persist
       - PATH=/persist/.local/bin:/root/.local/bin:/usr/local/bin:$PATH

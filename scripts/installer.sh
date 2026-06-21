@@ -18,6 +18,18 @@ for i in $(seq 0 $((count - 1))); do
   cmd=$(yq ".install.$key" /tmp/config.yml)
 
   echo "Installing $key: $cmd"
-  eval "$cmd"
+
+  # Run the install command. If it fails, check whether the tool binary
+  # already exists on PATH — if so, skip silently; otherwise propagate the
+  # error so set -e aborts the build.
+  if ! eval "$cmd"; then
+    if command -v "$key" &>/dev/null; then
+      echo "$key install reported failure but binary is present — skipping"
+    else
+      echo "ERROR: $key install failed and binary not found" >&2
+      exit 1
+    fi
+  fi
+
   echo "$key install complete"
 done
