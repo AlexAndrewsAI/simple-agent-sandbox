@@ -3,7 +3,3 @@ install:
   hermes: "curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh  -o /tmp/hermes_install.sh && bash /tmp/hermes_install.sh && rm -f /tmp/hermes_install.sh"
   devin: "curl -fsSL https://cli.devin.ai/install.sh -o /tmp/devin_install.sh && bash /tmp/devin_install.sh && rm -f /tmp/devin_install.sh"
   cline: "npm install -g cline"
-
-# Volume mounts — each entry is "host_path:container_path"
-mounts:
-#  - "my/folder:/my/target"
