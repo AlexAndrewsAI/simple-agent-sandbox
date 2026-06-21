@@ -17,6 +17,18 @@ All CLIs listed below offer usable free plans.
 - [Docker](https://docs.docker.com/get-docker/)
 - [Docker Compose](https://docs.docker.com/compose/install/)
 
+## Setup
+
+Both `config.yml` and `docker-compose.yml` are gitignored real config files. Copy the example templates to create your own:
+
+```bash
+cp config.example.yml config.yml
+cp docker-compose.example.yml docker-compose.yml
+```
+
+- Edit `config.yml` to enable/disable agent tools (comment out what you don't need)
+- Edit `docker-compose.yml` to add/remove volume mounts as needed
+
 ## Building
 
 Build the Docker image from the root of the repository:
@@ -82,14 +94,18 @@ Changes made inside `/persist` in the container are persisted on the host and su
 
 ```
 simple-agent-sandbox
-├── docker-compose.yml
 ├── Dockerfile
-├── config.yml
+├── docker-compose.example.yml   (tracked template)
+├── docker-compose.yml           (your real config — gitignored)
+├── config.example.yml           (tracked template)
+├── config.yml                   (your real config — gitignored)
 ├── .gitignore
-├── scripts
-│   └── installer.sh
-├── persist
-│   └── .bashrc
+├── scripts/
+│   ├── installer.sh
+│   ├── run.sh / run.ps1
+│   └── build.sh / build.ps1
+├── persist/                     (gitignored)
+│   └── .bashrc
 └── README.md
 ```
 
@@ -99,24 +115,11 @@ simple-agent-sandbox
 - The container runs `bash` by default, providing an interactive shell.
 - Tool installation is driven by `config.yml`. Each key under `install:` maps directly to its install command string.
 - The `scripts/installer.sh` script reads `config.yml` via `yq` and runs each install command listed.
+- Volume mounts are defined in `docker-compose.yml` — the single source of truth. Helper scripts are thin wrappers and do not duplicate mount logic.
 
-### Configuration
+## Troubleshooting
 
-Edit `config.yml` to enable or disable tools:
-
-- Comment out undesired apps
-
-```yaml
-# Install list — each key maps to its install command
-install:
-  tool-name: "command to install the tool"
-  # undesired-tool: "skip this one"
-  another-tool: "another install command"
-
-```
-# Troubleshooting
-
-## Cline
+### Cline
 
 - cline is buggy in setup in this environment, but it will work
 - don't run from root '/' directory, this seems to cause problems
@@ -127,5 +130,5 @@ cline
 ```
 
 - when signing up, initially select bring your own key | ollama
-- Once this is done, you can change provider by typing `/model` then `TAB` to change to whichever provider you want
-  - if you initially select `Login with Cline` it crashes, but if you switch to it after getting to the main interface it works 
+- Once this can change provider by typing `/model` then `TAB` to change to whichever provider you want
+  - if you initially select `Login with Cline` it crashes, but if you switch to it after getting to the main interface it works
