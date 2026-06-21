@@ -36,4 +36,5 @@ for i in $(seq 0 $((count - 1))); do
   fi
 
   echo "$key install complete"
+  which "$key"
 done
