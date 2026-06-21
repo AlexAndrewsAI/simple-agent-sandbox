@@ -19,7 +19,7 @@ RUN groupadd --gid ${USER_GID} sandbox \
   && useradd --uid ${USER_UID} --gid ${USER_GID} --create-home --shell /bin/bash sandbox
 
 COPY scripts/installer.sh /usr/local/bin/installer.sh
-COPY config.example.yml /tmp/config.yml
+COPY config.yml /tmp/config.yml
 
 RUN chown sandbox:sandbox /usr/local/bin/installer.sh /tmp/config.yml \
   && chmod +x /usr/local/bin/installer.sh
@@ -40,6 +40,6 @@ RUN mkdir -p /persist/.npm-global \
 
 RUN installer.sh
 
-ENV PATH="/persist/.npm-global/bin:/persist/.local/bin:/home/sandbox/.local/bin:/root/.local/bin:/root/.bun/bin:/usr/local/bin:${PATH}"
+ENV PATH="/home/sandbox/.npm-global/lib/node_modules/cline/bin:/home/sandbox/.npm-global/bin:/persist/.local/bin:/home/sandbox/.local/bin:/root/.local/bin:/root/.bun/bin:/usr/local/bin:${PATH}"
 
 CMD ["bash"]
