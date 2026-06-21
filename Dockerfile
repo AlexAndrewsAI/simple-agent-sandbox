@@ -4,9 +4,6 @@ FROM python:3-trixie
 ARG USER_UID=1000
 ARG USER_GID=1000
 
-ENV HOME=/persist
-WORKDIR /persist
-
 # Install Node.js 22+ (required by Cline) from NodeSource
 RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
   && apt-get install -y --no-install-recommends \
@@ -35,7 +32,8 @@ RUN mkdir -p /persist && chown sandbox:sandbox /persist
 # with HOME=/persist so tools (npm install -g, pip, etc.) write there
 # instead of to /usr/lib/node_modules (EACCES) or /home/sandbox (non-persistent).
 USER sandbox
-
+ENV HOME=/home/sandbox
+WORKDIR /home/sandbox
 
 RUN mkdir -p /persist/.npm-global \
   && npm config set prefix /persist/.npm-global
