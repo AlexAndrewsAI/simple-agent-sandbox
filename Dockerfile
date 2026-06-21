@@ -40,10 +40,6 @@ RUN mkdir -p /persist/.npm-global \
 
 RUN installer.sh
 
-# Set final working directory
-RUN mkdir -p /sandbox
-WORKDIR /sandbox
-
 ENV PATH="/persist/.npm-global/bin:/persist/.local/bin:/home/sandbox/.local/bin:/root/.local/bin:/root/.bun/bin:/usr/local/bin:${PATH}"
 
 CMD ["bash"]
