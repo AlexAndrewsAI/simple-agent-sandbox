@@ -12,7 +12,7 @@ RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
 
 ARG YQ_VERSION=v4.44.6
 RUN curl -fsSL "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64" -o /usr/local/bin/yq \
-  && chmod +x /usr/local/bin/yq
+  && chmod u+x /usr/local/bin/yq
 
 # Create a non-root user that matches the host UID/GID
 RUN groupadd --gid ${USER_GID} sandbox \
@@ -22,7 +22,7 @@ COPY scripts/installer.sh /usr/local/bin/installer.sh
 COPY config.example.yml /tmp/config.yml
 
 RUN chown sandbox:sandbox /usr/local/bin/installer.sh /tmp/config.yml \
-  && chmod +x /usr/local/bin/installer.sh
+  && chmod u+x /usr/local/bin/installer.sh
 
 # Create /persist directory so installer.sh can target it as HOME
 # (at runtime this is mounted from the host, but we need it during build)

@@ -36,5 +36,8 @@ for i in $(seq 0 $((count - 1))); do
   fi
 
   echo "$key install complete"
-  which "$key"
+  installed_path=$(command -v "$key" || true)
+  if [ -n "$installed_path" ]; then
+    echo "Installed at: $installed_path"
+  fi
 done
