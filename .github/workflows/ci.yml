@@ -56,11 +56,15 @@ jobs:
       - name: Syntax check installer.sh
         run: bash -n scripts/installer.sh
 
+      - name: Copy example configs
+        run: |
+          cp config.example.yml config.yml
+
       - name: Dry-run installer against config.example.yml
         run: |
           # Replace all install commands with 'true' so we validate parsing
           # and control flow without actually installing anything.
-          yq '.install | with_entries(.value = "true")' config.example.yml > /tmp/config.yml
+          yq '.install | with_entries(.value = "true")' config.yml > /tmp/config.yml
           bash -x scripts/installer.sh
 
   docker-build:
@@ -69,6 +73,10 @@ jobs:
     needs: validate-installer
     steps:
       - uses: actions/checkout@v4
+
+      - name: Copy example configs
+        run: |
+          cp docker-compose.example.yml docker-compose.yml
 
       - name: Build sandbox image
         run: docker compose build --progress=plain
