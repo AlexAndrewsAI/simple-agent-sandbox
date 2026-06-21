@@ -21,12 +21,29 @@ RUN groupadd --gid ${USER_GID} sandbox \
 COPY scripts/installer.sh /usr/local/bin/installer.sh
 COPY config.example.yml /tmp/config.yml
 
-RUN chmod +x /usr/local/bin/installer.sh && installer.sh
+RUN chown sandbox:sandbox /usr/local/bin/installer.sh /tmp/config.yml \
+  && chmod +x /usr/local/bin/installer.sh
 
-# Switch to non-root user
+# Create /persist directory so installer.sh can target it as HOME
+# (at runtime this is mounted from the host, but we need it during build)
+RUN mkdir -p /persist && chown sandbox:sandbox /persist
+
+# Switch to non-root user for tool installation,
+# with HOME=/persist so tools (npm install -g, pip, etc.) write there
+# instead of to /usr/lib/node_modules (EACCES) or /home/sandbox (non-persistent).
 USER sandbox
+ENV HOME=/persist
+WORKDIR /persist
+
+RUN mkdir -p /persist/.npm-global \
+  && npm config set prefix /persist/.npm-global
+
+RUN installer.sh
+
+# Set final working directory
+RUN mkdir -p /sandbox
 WORKDIR /sandbox
 
-ENV PATH="/home/sandbox/.local/bin:/root/.local/bin:/root/.bun/bin:/usr/local/bin:${PATH}"
+ENV PATH="/persist/.npm-global/bin:/persist/.local/bin:/home/sandbox/.local/bin:/root/.local/bin:/root/.bun/bin:/usr/local/bin:${PATH}"
 
 CMD ["bash"]
