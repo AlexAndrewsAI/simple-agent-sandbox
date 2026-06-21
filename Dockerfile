@@ -6,8 +6,6 @@ RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
     ca-certificates curl git bash xz-utils tar nodejs \
   && rm -rf /var/lib/apt/lists/*
 
-# Install Bun
-RUN curl -fsSL https://bun.sh/install | bash
 
 RUN curl -fsSL https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -o /usr/local/bin/yq \
   && chmod +x /usr/local/bin/yq

@@ -114,3 +114,18 @@ install:
   another-tool: "another install command"
 
 ```
+# Troubleshooting
+
+## Cline
+
+- cline is buggy in setup in this environment, but it will work
+- don't run from root '/' directory, this seems to cause problems
+
+```bash
+cd ~
+cline
+```
+
+- when signing up, initially select bring your own key | ollama
+- Once this is done, you can change provider by typing `/model` then `TAB` to change to whichever provider you want
+  - if you initially select `Login with Cline` it crashes, but if you switch to it after getting to the main interface it works 
