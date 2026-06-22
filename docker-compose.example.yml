@@ -7,7 +7,8 @@ services:
         USER_GID: ${GID:-1000}
     environment:
       - HOME=/persist
-      - PATH=/home/sandbox/.local/bin:/persist/.local/bin:/root/.local/bin:/usr/local/bin:/usr/bin:/bin:/home/sandbox/.npm-global/lib/node_modules/cline/bin
+      - PATH=/home/sandbox/.local/bin:/persist/.local/bin:/usr/local/bin:/usr/bin:/bin:/home/sandbox/node_modules/cline/bin
+      
     # Add other folders you wish included in the sandbox
     volumes:
       - ./persist:/persist
