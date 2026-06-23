@@ -8,9 +8,16 @@ services:
     environment:
       - HOME=/persist
       - PATH=/home/sandbox/.local/bin:/persist/.local/bin:/usr/local/bin:/usr/bin:/bin:/home/sandbox/node_modules/cline/bin
-      
-    # Add other folders you wish included in the sandbox
+    
+    
     volumes:
+      # ┌─────────────────────────────────────────────────────────┐
+      # │  ADD YOUR MOUNTS HERE                                   │
+      # │  Adjust to include other folders in the                 │
+      # │  sandbox, e.g.:                                         │
+      # │    - ./workspace:/workspace                             │
+      # │    - ~/data:/data                                       │
+      # └─────────────────────────────────────────────────────────┘
       - ./persist:/persist
     tty: true
     stdin_open: true

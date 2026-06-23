@@ -76,6 +76,7 @@ jobs:
 
       - name: Copy example configs
         run: |
+          cp config.example.yml config.yml
           cp docker-compose.example.yml docker-compose.yml
 
       - name: Build sandbox image

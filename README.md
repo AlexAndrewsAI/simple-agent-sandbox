@@ -17,6 +17,30 @@ All CLIs listed below offer usable free plans.
 - [Docker](https://docs.docker.com/get-docker/)
 - [Docker Compose](https://docs.docker.com/compose/install/)
 
+## Quick Pull (Pre-built Image)
+
+A pre-built image is available on Docker Hub. If you don't need to customize the build, you can skip the clone-and-build workflow entirely:
+
+```bash
+docker pull alexandrewsai/simple-agent-sandbox:latest
+```
+
+Then run it with your own config and persist directory:
+
+```bash
+docker run -it --rm \
+  -v $(pwd)/config.yml:/app/config.yml \
+  -v $(pwd)/persist:/persist \
+  -e HOME=/persist \
+  alexandrewsai/simple-agent-sandbox:latest
+```
+
+To use `docker-compose` with the pre-built image, set the `IMAGE` environment variable or edit `docker-compose.yml` to reference `alexandrewsai/simple-agent-sandbox:latest` instead of building locally:
+
+```bash
+IMAGE=alexandrewsai/simple-agent-sandbox:latest docker compose run --rm sandbox
+```
+
 ## Setup
 
 Both `config.yml` and `docker-compose.yml` are gitignored real config files. Copy the example templates to create your own:
@@ -82,6 +106,10 @@ The `./persist` directory on the host is mounted into the container at `/persist
 - Shell history (`/persist/.bash_history`)
 
 Changes made inside `/persist` in the container are persisted on the host and survive container restarts.
+
+### Personal Bashrc
+
+If you want personal shell customizations (aliases, functions, env vars) that won't be committed to git, put them in `/persist/bashrc-extra`. The sourced `.bashrc` sources this file at startup if it exists. This file is gitignored, so it stays local to your environment.
 
 ## Environment Variables
 

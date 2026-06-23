@@ -28,4 +28,11 @@ function f {
 alias uv-tests="source .venv/bin/activate; uv sync --dev; ruff format; ruff check --fix; pytest --cov=myproj --cov-report term-missing; mypy ."
 alias venv-here="[ ! -d .venv ] && uv venv; source .venv/bin/activate"
 
+
+
+# Source personal customizations if present (not committed to git)
+if [ -f /persist/bashrc-extra ]; then
+    . /persist/bashrc-extra
+fi
+
 echo "Welcome to the Simple Agent Sandbox!"

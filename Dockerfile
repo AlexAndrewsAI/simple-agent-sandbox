@@ -1,3 +1,5 @@
+# Use full trixie (not slim) — saves ~20 min of build time by avoiding
+# apt-get compilation of native deps during agent installs.
 FROM python:3-trixie
 
 # Build args for matching host user UID/GID
@@ -40,6 +42,6 @@ RUN mkdir -p /persist/.npm-global \
 
 RUN installer.sh
 
-ENV PATH="/home/sandbox/.npm-global/lib/node_modules/cline/bin:/home/sandbox/.npm-global/bin:/persist/.local/bin:/home/sandbox/.local/bin:/root/.local/bin:/root/.bun/bin:/usr/local/bin:${PATH}"
+ENV PATH="/home/sandbox/.npm-global/lib/node_modules/cline/bin:/home/sandbox/.npm-global/bin:/persist/.local/bin:/home/sandbox/.local/bin:/home/sandbox/.cargo/bin:/root/.local/bin:/root/.bun/bin:/usr/local/bin:${PATH}"
 
 CMD ["bash"]

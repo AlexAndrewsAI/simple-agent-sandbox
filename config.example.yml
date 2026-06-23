@@ -1,5 +1,11 @@
 # Install list — each key maps to its install command
 install:
+  # Useful Python dev packages
+  uv: "curl -LsSf https://astral.sh/uv/install.sh | sh"
+  pytest: "uv tool install pytest"
+  ruff: "uv tool install ruff"
+  mypy: "uv tool install mypy"
+  # AI agents with strong free plans
   hermes: "curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh  -o /tmp/hermes_install.sh && bash /tmp/hermes_install.sh && rm -f /tmp/hermes_install.sh"
   devin: "curl -fsSL https://cli.devin.ai/install.sh -o /tmp/devin_install.sh && bash /tmp/devin_install.sh && rm -f /tmp/devin_install.sh"
   cline: "npm install cline"
