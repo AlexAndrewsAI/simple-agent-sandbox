@@ -82,7 +82,7 @@ Or use the helper script:
 ```
 
 This will:
-1. Start from a `python:3-slim-trixie` base image
+1. Start from a `python:3-trixie` base image
 2. Install required system packages (`ca-certificates`, `curl`, `git`, `bash`, `xz-utils`, `tar`)
 3. Install `yq` for reading YAML config
 4. Copy `scripts/installer.sh` and `config.yml`
