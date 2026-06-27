@@ -9,9 +9,6 @@ services:
     environment:
       - PATH=/home/sandbox/.local/bin:/persist/.local/bin:/usr/local/bin:/usr/bin:/bin:/home/sandbox/node_modules/cline/bin
       - HOME=/persist
-      
-    
-    
     volumes:
       # ┌─────────────────────────────────────────────────────────┐
       # │  ADD YOUR MOUNTS HERE                                   │
