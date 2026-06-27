@@ -1,6 +1,6 @@
 # Simple Agent Sandbox
 
-A Docker-based sandbox environment for running AI agents.
+A Docker-based sandbox environment for running AI agents. Mounts `./persist` directory as run-time `HOME` so agents' states are durable across container restart.
 
 ## Agents
 
@@ -11,6 +11,19 @@ All CLIs listed below offer usable free plans.
 | [Hermes Agent](https://hermes-agent.nousresearch.com/) | Free models via API with [OpenRouter](https://openrouter.ai) or [Nvidia](https://build.nvidia.com) | Install is large and takes a while |
 | [Cline](https://cline.bot/)                             | Offers a free plan with decent LLM models                                   | Heavy install               |
 | [Devin CLI](https://cli.devin.ai/)                     | Offers free plan with decent LLM model                                      | Lightweight install                |
+
+## Data Persistence
+
+The `./persist` directory on the host is mounted into the container at `/persist`. This directory is used to store:
+
+- Home directory and tool state (`/persist/.local/`)
+- Shell history (`/persist/.bash_history`)
+
+Changes made inside `/persist` in the container are persisted on the host and survive container restarts.
+
+### Personal Bashrc
+
+If you want personal shell customizations (aliases, functions, env vars) that won't be committed to git, put them in `/persist/bashrc-extra`. The sourced `.bashrc` sources this file at startup if it exists. This file is gitignored, so it stays local to your environment.
 
 ## Prerequisites
 
@@ -97,20 +110,6 @@ Or, for a persistent TTY session:
 docker compose up -d
 docker compose exec sandbox bash
 ```
-
-## Data Persistence
-
-The `./persist` directory on the host is mounted into the container at `/persist`. This directory is used to store:
-
-- Home directory and tool state (`/persist/.local/`)
-- Shell history (`/persist/.bash_history`)
-
-Changes made inside `/persist` in the container are persisted on the host and survive container restarts.
-
-### Personal Bashrc
-
-If you want personal shell customizations (aliases, functions, env vars) that won't be committed to git, put them in `/persist/bashrc-extra`. The sourced `.bashrc` sources this file at startup if it exists. This file is gitignored, so it stays local to your environment.
-
 ## Environment Variables
 
 | Variable | Value                       | Description                                  |

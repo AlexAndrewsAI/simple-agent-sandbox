@@ -1,5 +1,6 @@
 services:
   sandbox:
+    image: alexandrewsai/simple-agent-sandbox:latest
     build:
       context: .
       args:
