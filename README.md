@@ -89,6 +89,8 @@ This will:
 5. Run `installer.sh`, which installs all tools listed under `install:` in `config.yml`
 6. Set up the PATH to include installed binaries
 
+Build times can be significant. Selecting Hermes Agent in particular results in long build due to its dependencies.
+
 ## Running
 
 Start an interactive shell inside the sandbox container:
