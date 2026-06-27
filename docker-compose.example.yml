@@ -1,15 +1,14 @@
 services:
   sandbox:
+    image: alexandrewsai/simple-agent-sandbox:latest
     build:
       context: .
       args:
         USER_UID: ${UID:-1000}
         USER_GID: ${GID:-1000}
     environment:
-      - HOME=/persist
       - PATH=/home/sandbox/.local/bin:/persist/.local/bin:/usr/local/bin:/usr/bin:/bin:/home/sandbox/node_modules/cline/bin
-    
-    
+      - HOME=/persist
     volumes:
       # ┌─────────────────────────────────────────────────────────┐
       # │  ADD YOUR MOUNTS HERE                                   │

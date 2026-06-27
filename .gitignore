@@ -8,3 +8,6 @@
 
 # Don't commit actual compose file, use docker-compose.example.yml as template
 /docker-compose.yml
+
+temp.*
+*.temp
