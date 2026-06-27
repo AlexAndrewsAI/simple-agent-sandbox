@@ -26,22 +26,18 @@ COPY config.yml /tmp/config.yml
 RUN chown sandbox:sandbox /usr/local/bin/installer.sh /tmp/config.yml \
   && chmod +x /usr/local/bin/installer.sh
 
-# Create /persist directory so installer.sh can target it as HOME
-# (at runtime this is mounted from the host, but we need it during build)
+# Create /persist directory (mounted from host at runtime)
 RUN mkdir -p /persist && chown sandbox:sandbox /persist
 
-# Switch to non-root user for tool installation,
-# with HOME=/persist so tools (npm install -g, pip, etc.) write there
-# instead of to /usr/lib/node_modules (EACCES) or /home/sandbox (non-persistent).
+# Switch to non-root user for tool installation.
 USER sandbox
 ENV HOME=/home/sandbox
 WORKDIR /home/sandbox
 
-RUN mkdir -p /persist/.npm-global \
-  && npm config set prefix /persist/.npm-global
+RUN mkdir -p /home/sandbox/.npm-global
 
 RUN installer.sh
 
-ENV PATH="/home/sandbox/.npm-global/lib/node_modules/cline/bin:/home/sandbox/.npm-global/bin:/persist/.local/bin:/home/sandbox/.local/bin:/home/sandbox/.cargo/bin:/root/.local/bin:/root/.bun/bin:/usr/local/bin:${PATH}"
+ENV PATH="/home/sandbox/node_modules/cline/bin:/home/sandbox/.npm-global/bin:/persist/.local/bin:/home/sandbox/.local/bin:/home/sandbox/.cargo/bin:/root/.local/bin:/root/.bun/bin:/usr/local/bin:${PATH}"
 
 CMD ["bash"]
