@@ -16,12 +16,28 @@ ARG YQ_VERSION=v4.44.6
 RUN curl -fsSL "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64" -o /usr/local/bin/yq \
   && chmod +x /usr/local/bin/yq
 
+COPY config.yml /tmp/config.yml
+
+# Install apt packages from config.yml (if any)
+RUN if [ -f /tmp/config.yml ] && yq '.apt' /tmp/config.yml &>/dev/null; then \
+      apt-get update && \
+      PACKAGES=$(yq '.apt[]' /tmp/config.yml | tr '\n' ' ') && \
+      apt-get install -y --no-install-recommends $PACKAGES && \
+      rm -rf /var/lib/apt/lists/*; \
+    fi
+
 # Create a non-root user that matches the host UID/GID
 RUN groupadd --gid ${USER_GID} sandbox \
   && useradd --uid ${USER_UID} --gid ${USER_GID} --create-home --shell /bin/bash sandbox
 
+# Install sudo and give sandbox user password-less sudo access
+RUN apt-get update && \
+      apt-get install -y --no-install-recommends sudo \
+      && rm -rf /var/lib/apt/lists/* && \
+      echo "sandbox ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/sandbox && \
+      chmod 0440 /etc/sudoers.d/sandbox
+
 COPY scripts/installer.sh /usr/local/bin/installer.sh
-COPY config.yml /tmp/config.yml
 
 RUN chown sandbox:sandbox /usr/local/bin/installer.sh /tmp/config.yml \
   && chmod +x /usr/local/bin/installer.sh

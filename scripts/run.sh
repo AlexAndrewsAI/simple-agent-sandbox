@@ -1,6 +1,10 @@
 #!/bin/bash
 # run.sh - Start an interactive shell inside the sandbox container
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/.." || exit
+
+# --- Prerequisite: config files ----------------------------------------------
+source scripts/_config_check.sh
+
 if command -v docker &>/dev/null && docker compose version &>/dev/null; then
   docker compose run --rm sandbox bash
 elif command -v docker-compose &>/dev/null; then

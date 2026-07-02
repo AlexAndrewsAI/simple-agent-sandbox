@@ -1,10 +1,7 @@
 # Agent Instructions: simple-agent-sandbox
 
 ## Quick Start
-1. **Copy Configs:** Copy the example files and edit to taste:
-   ```bash
-   cp config.example.yml config.yml
-   cp docker-compose.example.yml docker-compose.yml
+1. **User Configs:** Do not remove the user's files config.yml and docker-compose.yml unless explicitly asked to
    ```
 2. **Edit:** Uncomment/adjust mounts in `docker-compose.yml` and tools in `config.yml`
 3. **Build:** `docker compose build`
@@ -23,9 +20,9 @@
 ```
 simple-agent-sandbox/
   ├── Dockerfile                    (Container build instructions)
-  ├── docker-compose.example.yml    (Template — copy to docker-compose.yml)
+  ├── docker-compose.example.yml    (Template)
   ├── docker-compose.yml            (Real compose file — gitignored)
-  ├── config.example.yml            (Template — copy to config.yml)
+  ├── config.example.yml            (Template)
   ├── config.yml                    (Real config — gitignored)
   ├── scripts/
   │   ├── installer.sh              (Reads config.yml, runs install commands)
@@ -40,6 +37,7 @@ simple-agent-sandbox/
 ### Configuration Management
 - **Real files are gitignored:** Both `config.yml` and `docker-compose.yml` are real config files that live in `.gitignore`. The `*.example.*` files are the tracked templates.
 - **Adding/Removing Tools:** Edit `config.yml` — add/comment out entries under `install:`
+- **Apt Packages:** Edit `config.yml` — add/remove packages under `apt:` (installed during Docker build as root)
 - **Install Format:** Each key under `install:` maps to a shell command string executed by `scripts/installer.sh`
 - **Config-Driven:** All tool installation is driven by `config.yml`; do not hardcode installs in the Dockerfile
 - **Mounts in Compose:** Volume mounts are defined in `docker-compose.yml`, not parsed from config.yml by helper scripts
@@ -47,6 +45,7 @@ simple-agent-sandbox/
 ### Docker Workflow
 - **Real compose over helpers:** The source of truth for volumes, env, and service config is `docker-compose.yml`. The helper scripts (`run.sh`, `build.sh`) are thin wrappers around `docker compose`.
 - **Rebuild After Config Changes:** If `config.yml` changes, rebuild with `docker compose build`
+- **Container User:** Container runs as the `sandbox` user (non-root) with password-less sudo access
 - **Persistent State:** All persistent data lives in `./persist` on the host, mounted at `/persist` in the container
 - **No State in Image:** Do not store credentials, keys, or session data in the Docker image layers
 
