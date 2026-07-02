@@ -2,7 +2,6 @@
 # installer.sh - Conditional tool installer driven by config.yml
 # Reads /tmp/config.yml using yq and installs all tools listed under install.<key>.
 set -euo pipefail
-set -x
 
 # Ensure both ~/.local/bin and ~/.npm-global/bin are on PATH so
 # newly-installed binaries (pip, npm) are visible to the `command -v`
@@ -25,8 +24,8 @@ for i in $(seq 0 $((count - 1))); do
   echo "Installing $key: $cmd"
 
   # Run the install command. If it fails, check whether the tool binary
-  # already exists on PATH — if so, skip silently; otherwise propagate the
-  # error so set -e aborts the build.
+  # already exists on PATH — if so, skip with a warning; otherwise propagate
+  # the error so set -e aborts the build.
   if ! eval "$cmd"; then
     if command -v "$key" &>/dev/null; then
       echo "$key install reported failure but binary is present — skipping"
