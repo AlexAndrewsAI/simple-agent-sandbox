@@ -1,7 +1,7 @@
 #!/bin/bash
 # build.sh - Build the Docker image (and optionally push to Docker Hub)
 set -euo pipefail
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/.." || exit
 
 # --- Prerequisite: config files ----------------------------------------------
 missing_files=()
