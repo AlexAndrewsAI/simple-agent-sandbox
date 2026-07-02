@@ -1,22 +1,36 @@
 # build.ps1 - Build the Docker image (and optionally push to Docker Hub)
 $repoRoot = Split-Path -Parent $PSScriptRoot
 
+# --- Prerequisite: config files ----------------------------------------------
+$missingFiles = @()
 if (-not (Test-Path "$repoRoot\config.yml")) {
-  Write-Host "config.yml not found. Create it from the example:" -ForegroundColor Yellow
-  Write-Host ""
-  Write-Host "  cp config.example.yml config.yml"
-  Write-Host ""
-  Write-Host "Then edit config.yml to enable the tools you want."
-  exit 1
+  $missingFiles += "config.yml"
+}
+if (-not (Test-Path "$repoRoot\docker-compose.yml")) {
+  $missingFiles += "docker-compose.yml"
 }
 
-if (-not (Test-Path "$repoRoot\docker-compose.yml")) {
-  Write-Host "docker-compose.yml not found. Create it from the example:" -ForegroundColor Yellow
+if ($missingFiles.Count -gt 0) {
+  Write-Host "The following config files are missing:" -ForegroundColor Yellow
+  foreach ($file in $missingFiles) {
+    Write-Host "  - $file"
+  }
   Write-Host ""
-  Write-Host "  cp docker-compose.example.yml docker-compose.yml"
-  Write-Host ""
-  Write-Host "Then uncomment/adjust the volume mounts in docker-compose.yml."
-  exit 1
+  $response = Read-Host "Copy from example files? [y/N]"
+  if ($response -eq 'y' -or $response -eq 'Y') {
+    foreach ($file in $missingFiles) {
+      $example = $file -replace '\.yml$', '.example.yml'
+      if (Test-Path "$repoRoot\$example") {
+        Copy-Item "$repoRoot\$example" "$repoRoot\$file"
+        Write-Host "Copied $example to $file" -ForegroundColor Green
+      } else {
+        Write-Host "ERROR: $example not found" -ForegroundColor Red
+        exit 1
+      }
+    }
+  } else {
+    exit 1
+  }
 }
 
 docker compose build --progress=plain

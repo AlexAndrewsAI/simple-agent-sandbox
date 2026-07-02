@@ -7,9 +7,23 @@ on:
     branches: [main, master]
 
 jobs:
+  shellcheck:
+    name: Shell script lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install shellcheck
+        run: sudo apt-get update && sudo apt-get install -y shellcheck
+
+      - name: Shellcheck scripts
+        run: shellcheck scripts/*.sh
+
   validate-config:
     name: Validate config.example.yml
     runs-on: ubuntu-latest
+    needs: shellcheck
     steps:
       - uses: actions/checkout@v4
 
@@ -23,6 +37,15 @@ jobs:
         run: |
           echo "Checking YAML syntax..."
           yq '.' config.example.yml > /dev/null
+
+          echo "Checking apt list is non-empty..."
+          apt_count=$(yq '.apt | length' config.example.yml)
+          if [ "$apt_count" -eq 0 ]; then
+            echo "ERROR: no apt packages found" >&2
+            exit 1
+          fi
+          echo "Apt packages: $apt_count"
+
           echo "Checking install keys are non-empty..."
           count=$(yq '.install | length' config.example.yml)
           if [ "$count" -eq 0 ]; then
@@ -43,7 +66,7 @@ jobs:
   validate-installer:
     name: Validate installer.sh (dry-run)
     runs-on: ubuntu-latest
-    needs: validate-config
+    needs: [shellcheck, validate-config]
     steps:
       - uses: actions/checkout@v4
 

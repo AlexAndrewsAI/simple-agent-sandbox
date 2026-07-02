@@ -2,15 +2,81 @@
 
 A Docker-based sandbox environment for running AI agents. Mounts `./persist` directory as run-time `HOME` so agents' states are durable across container restart.
 
+## Quick Start
+1. **Copy Configs:** Copy the example files (build/run scripts will prompt if missing):
+   ```bash
+   cp config.example.yml config.yml
+   cp docker-compose.example.yml docker-compose.yml
+   ```
+2. **Edit:** Uncomment/adjust mounts in `docker-compose.yml` and tools in `config.yml`
+3. **Build:** `docker compose build`
+4. **Run:** `docker compose run --rm sandbox`
+
+## Tech Stack
+| Component | Tool |
+|-----------|------|
+| Container Runtime | Docker & Docker Compose |
+| Base Image | python:3-trixie |
+| Config Format | YAML (read via yq) |
+| Shell | Bash |
+| Package Manager | npm (for Cline), curl-based installers |
+
+## Project Structure
+```
+simple-agent-sandbox/
+  ├── Dockerfile                    (Container build instructions)
+  ├── docker-compose.example.yml    (Template — copy to docker-compose.yml)
+  ├── docker-compose.yml            (Real compose file — gitignored)
+  ├── config.example.yml            (Template — copy to config.yml)
+  ├── config.yml                    (Real config — gitignored)
+  ├── scripts/
+  │   ├── installer.sh              (Reads config.yml, runs install commands)
+  │   ├── run.sh / run.ps1          (Start interactive sandbox shell)
+  │   └── build.sh / build.ps1      (Build the Docker image)
+  ├── persist/                      (Mounted volume for persistent state, gitignored)
+  └── README.md
+```
+
+## Essential Directives
+
+### Configuration Management
+- **Real files are gitignored:** Both `config.yml` and `docker-compose.yml` are real config files that live in `.gitignore`. The `*.example.*` files are the tracked templates.
+- **Adding/Removing Tools:** Edit `config.yml` — add/comment out entries under `install:`
+- **Apt Packages:** Edit `config.yml` — add/remove packages under `apt:` (installed during Docker build as root)
+- **Install Format:** Each key under `install:` maps to a shell command string executed by `scripts/installer.sh`
+- **Config-Driven:** All tool installation is driven by `config.yml`; do not hardcode installs in the Dockerfile
+- **Mounts in Compose:** Volume mounts are defined in `docker-compose.yml`, not parsed from config.yml by helper scripts
+
+### Docker Workflow
+- **Real compose over helpers:** The source of truth for volumes, env, and service config is `docker-compose.yml`. The helper scripts (`run.sh`, `build.sh`) are thin wrappers around `docker compose`.
+- **Rebuild After Config Changes:** If `config.yml` changes, rebuild with `docker compose build`
+- **Container User:** Container runs as the `sandbox` user (non-root) with password-less sudo access
+- **Persistent State:** All persistent data lives in `./persist` on the host, mounted at `/persist` in the container
+- **No State in Image:** Do not store credentials, keys, or session data in the Docker image layers
+
+### Operational Constraints
+- **No Interactive Prompts:** Mock or bypass any interactive commands in install scripts
+- **No Git Operations:** Don't stage/commit unless explicitly requested
+- **Keep Instructions Current:** Update "Tech Stack," "Project Structure," and "Workflow Commands" if the Dockerfile, config format, or core tooling changes
+
+## Workflow Commands
+```bash
+cp config.example.yml config.yml                # Create real config from template
+cp docker-compose.example.yml docker-compose.yml # Create real compose from template
+docker compose build                             # Rebuild the sandbox image
+docker compose run --rm sandbox                  # Interactive shell in sandbox
+docker compose up -d && docker compose exec sandbox bash  # Persistent session
+```
+
 ## Agents
 
 All CLIs listed below offer usable free plans.
 
-| Agent                                                  | Description                                                                 | Notes                              |
-| ------------------------------------------------------ | --------------------------------------------------------------------------- | ---------------------------------- |
+| Agent | Description | Notes |
+|-------|-------------|-------|
 | [Hermes Agent](https://hermes-agent.nousresearch.com/) | Free models via API with [OpenRouter](https://openrouter.ai) or [Nvidia](https://build.nvidia.com) | Install is large and takes a while |
-| [Cline](https://cline.bot/)                             | Offers a free plan with decent LLM models                                   | Heavy install               |
-| [Devin CLI](https://cli.devin.ai/)                     | Offers free plan with decent LLM model                                      | Lightweight install                |
+| [Cline](https://cline.bot/) | Offers a free plan with decent LLM models | Heavy install |
+| [Devin CLI](https://cli.devin.ai/) | Offers free plan with decent LLM model | Lightweight install |
 
 ## Data Persistence
 
@@ -54,97 +120,12 @@ To use `docker-compose` with the pre-built image, set the `IMAGE` environment va
 IMAGE=alexandrewsai/simple-agent-sandbox:latest docker compose run --rm sandbox
 ```
 
-## Setup
-
-Both `config.yml` and `docker-compose.yml` are gitignored real config files. Copy the example templates to create your own:
-
-```bash
-cp config.example.yml config.yml
-cp docker-compose.example.yml docker-compose.yml
-```
-
-- Edit `config.yml` to enable/disable agent tools (comment out what you don't need)
-- Edit `docker-compose.yml` to add/remove volume mounts as needed
-
-## Building
-
-Build the Docker image from the root of the repository:
-
-```bash
-docker compose build
-```
-
-Or use the helper script:
-
-```bash
-./scripts/build.sh        # Bash (uses --progress=plain for visible output)
-.\scripts\build.ps1       # PowerShell (uses --progress=plain for visible output)
-```
-
-This will:
-1. Start from a `python:3-trixie` base image
-2. Install required system packages (`ca-certificates`, `curl`, `git`, `bash`, `xz-utils`, `tar`)
-3. Install `yq` for reading YAML config
-4. Copy `scripts/installer.sh` and `config.yml`
-5. Run `installer.sh`, which installs all tools listed under `install:` in `config.yml`
-6. Set up the PATH to include installed binaries
-
-Build times can be significant. Selecting Hermes Agent in particular results in long build due to its dependencies.
-
-## Running
-
-Start an interactive shell inside the sandbox container:
-
-```bash
-docker compose run --rm sandbox
-```
-
-Or use the helper script:
-
-```bash
-./scripts/run.sh          # Bash
-.\scripts\run.ps1         # PowerShell
-```
-
-Or, for a persistent TTY session:
-
-```bash
-docker compose up -d
-docker compose exec sandbox bash
-```
 ## Environment Variables
 
-| Variable | Value                       | Description                                  |
-| -------- | --------------------------- | -------------------------------------------- |
-| `HOME`   | `/persist`                  | Sets the home directory inside the container |
-| `PATH`   | `/persist/.local/bin:$PATH` | Ensures installed binaries are available     |
-
-## Project Structure
-
-```
-simple-agent-sandbox
-├── Dockerfile
-├── docker-compose.example.yml   (tracked template)
-├── docker-compose.yml           (your real config — gitignored)
-├── config.example.yml           (tracked template)
-├── config.yml                   (your real config — gitignored)
-├── .gitignore
-├── scripts/
-│   ├── installer.sh
-│   ├── run.sh / run.ps1
-│   └── build.sh / build.ps1
-├── persist/                     (gitignored)
-│   └── .bashrc
-└── README.md
-```
-
-## Notes
-
-- The `./persist` directory is gitignored and should not be committed.
-- The container runs `bash` by default, providing an interactive shell.
-- Tool installation is driven by `config.yml`. Each key under `install:` maps directly to its install command string.
-- The `scripts/installer.sh` script reads `config.yml` via `yq` and runs each install command listed.
-- Volume mounts are defined in `docker-compose.yml` — the single source of truth. Helper scripts are thin wrappers and do not duplicate mount logic.
+| Variable | Value | Description |
+|----------|-------|-------------|
+| `HOME` | `/persist` | Sets the home directory inside the container |
+| `PATH` | `/persist/.local/bin:$PATH` | Ensures installed binaries are available |
 
 ## Troubleshooting
 
