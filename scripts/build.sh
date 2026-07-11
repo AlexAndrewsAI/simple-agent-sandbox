@@ -7,4 +7,3 @@ cd "$(dirname "$0")/.." || exit
 source scripts/_config_check.sh
 
 docker compose build --progress=plain "$@"
-

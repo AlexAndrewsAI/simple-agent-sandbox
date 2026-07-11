@@ -1,0 +1,23 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-yaml
+        name: Check YAML files
+      - id: check-toml
+        name: Check TOML files
+      - id: end-of-file-fixer
+        name: Fix end of files
+      - id: check-added-large-files
+        name: Check for large files
+        args: ['--maxkb=1000']
+      - id: trailing-whitespace
+        name: Trim trailing whitespace
+
+  - repo: local
+    hooks:
+      - id: shellcheck
+        name: Lint shell scripts with shellcheck
+        entry: uv run shellcheck -x
+        language: system
+        files: \.(sh|bash)$
