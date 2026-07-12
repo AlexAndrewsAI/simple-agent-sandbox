@@ -96,10 +96,22 @@ jobs:
 
       - name: Dry-run installer against config.example.yml
         run: |
+          # Copy config.yml to /tmp/config.yml (as Dockerfile does)
+          cp config.yml /tmp/config.yml
           # Replace all install commands with 'true' so we validate parsing
           # and control flow without actually installing anything.
-          yq '.install | with_entries(.value = "true")' config.yml > /tmp/config.yml
+          yq '.install | with_entries(.value = "true")' /tmp/config.yml > /tmp/config_test.yml
+          mv /tmp/config_test.yml /tmp/config.yml
           bash -x scripts/installer.sh
+
+      - name: Test command validation
+        run: |
+          # Test that validation blocks malicious commands
+          if bash -c 'source scripts/installer.sh && validate_command "rm -rf / && echo hacked"'; then
+            echo "ERROR: Validation failed to block malicious command"
+            exit 1
+          fi
+          echo "Validation correctly blocked malicious command"
 
   docker-build:
     name: Build Docker image
