@@ -87,14 +87,14 @@ docker compose up -d && docker compose exec sandbox bash  # Persistent session
 
 ## Agents
 
-All CLIs listed below offer usable free plans.
+All CLIs listed below offer usable **free** plans.
 
-| Agent                                                  | Description                                                                                        | Notes                              |
-| ------------------------------------------------------ | -------------------------------------------------------------------------------------------------- | ---------------------------------- |
-| [Hermes Agent](https://hermes-agent.nousresearch.com/) | Free models via API with [OpenRouter](https://openrouter.ai) or [Nvidia](https://build.nvidia.com) | Install is large and takes a while |
-| [Cline](https://cline.bot/)                            | Offers a free plan with decent LLM models                                                          | Heavy install                      |
-| [Devin CLI](https://cli.devin.ai/)                     | Offers free plan with decent LLM model                                                             | Lightweight install                |
-| [OpenCode](https://opencode.ai)                        | Offers decent free models via OpenCode Zen                                                         | Lightweight install                |
+| Agent                                                  | Description                                                                                        | Notes          | Recommendation 2026-07-12 |
+| ------------------------------------------------------ | -------------------------------------------------------------------------------------------------- | -------------- | ------------------------- |
+| [Hermes Agent](https://hermes-agent.nousresearch.com/) | Free models via API with [OpenRouter](https://openrouter.ai) or [Nvidia](https://build.nvidia.com) | Heavy Install  | openrouter/hy3            |
+| [Cline](https://cline.bot/)                            | Offers a free plan with decent LLM models                                                          | Medium install | deepseek-v4-flash         |
+| [Devin CLI](https://cli.devin.ai/)                     | Offers free plan with decent LLM model                                                             | Light install  | swe-1.6                   |
+| [OpenCode](https://opencode.ai)                        | Offers decent free models via OpenCode Zen                                                         | Light install  | big-pickle                |
 
 ## Data Persistence
 
