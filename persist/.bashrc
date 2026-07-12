@@ -17,15 +17,16 @@ alias ll="ls -lha"
 alias la="ls -a"
 alias ld="ls -d"
 alias lt="ls -lhatr"
+alias bashrc="source $HOME/.bashrc"
 devnullredirect () {
     echo "$@ 2>/dev/null"
     "$@" 2>/dev/null
 }
 function f {
-    devnullredirect find . -iname $@
+    devnullredirect find . -iname "$1" "${@:2}"
 }
 
-alias uv-tests="source .venv/bin/activate; uv sync --dev; ruff format; ruff check --fix; pytest --cov=myproj --cov-report term-missing; mypy ."
+alias uv-tests="source .venv/bin/activate; uv sync --dev; uv run ruff format; uv run ruff check --fix; uv run pytest; mypy ."
 alias venv-here="[ ! -d .venv ] && uv venv; source .venv/bin/activate"
 
 

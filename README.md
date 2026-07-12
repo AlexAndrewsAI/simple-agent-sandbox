@@ -3,27 +3,38 @@
 A Docker-based sandbox environment for running AI agents. Mounts `./persist` directory as run-time `HOME` so agents' states are durable across container restart.
 
 ## Quick Start
+
 1. **Copy Configs:** Copy the example files (build/run scripts will prompt if missing):
-   ```bash
-   cp config.example.yml config.yml
-   cp docker-compose.example.yml docker-compose.yml
-   ```
+
+    ```bash
+    cp config.example.yml config.yml
+    cp docker-compose.example.yml docker-compose.yml
+    ```
+
 2. **Edit:** Uncomment/adjust mounts in `docker-compose.yml` and tools in `config.yml`
 3. **Build:** `docker compose build`
 4. **Run:** `docker compose run --rm sandbox`
 
 ## Tech Stack
-| Component | Tool |
-|-----------|------|
-| Container Runtime | Docker & Docker Compose |
-| Base Image | python:3-trixie |
-| Config Format | YAML (read via yq) |
-| Shell | Bash |
-| Package Manager | npm (for Cline), curl-based installers |
+
+| Component         | Tool                                   |
+| ----------------- | -------------------------------------- |
+| Container Runtime | Docker & Docker Compose                |
+| Base Image        | python:3-trixie                        |
+| Config Format     | YAML (read via yq)                     |
+| Shell             | Bash                                   |
+| Package Manager   | npm (for Cline), curl-based installers |
+| Markdown Lint     | pymarkdownlnt                          |
+| Shell Script Lint | shellcheck                             |
+| Git Hooks         | prek                                   |
 
 ## Project Structure
-```
+
+```text
 simple-agent-sandbox/
+  ├── .github/
+  │   └── workflows/
+  │       └── ci.yml                (CI pipeline for linting and validation)
   ├── Dockerfile                    (Container build instructions)
   ├── docker-compose.example.yml    (Template — copy to docker-compose.yml)
   ├── docker-compose.yml            (Real compose file — gitignored)
@@ -31,15 +42,18 @@ simple-agent-sandbox/
   ├── config.yml                    (Real config — gitignored)
   ├── scripts/
   │   ├── installer.sh              (Reads config.yml, runs install commands)
-  │   ├── run.sh / run.ps1          (Start interactive sandbox shell)
-  │   └── build.sh / build.ps1      (Build the Docker image)
+  │   ├── run.sh / win-run.ps1      (Start interactive sandbox shell)
+  │   └── build.sh / win-build.ps1  (Build the Docker image)
   ├── persist/                      (Mounted volume for persistent state, gitignored)
+  ├── AGENTS.md                     (Agent-specific instructions)
+  ├── CHANGELOG.md                  (Project changelog)
   └── README.md
 ```
 
 ## Essential Directives
 
 ### Configuration Management
+
 - **Real files are gitignored:** Both `config.yml` and `docker-compose.yml` are real config files that live in `.gitignore`. The `*.example.*` files are the tracked templates.
 - **Adding/Removing Tools:** Edit `config.yml` — add/comment out entries under `install:`
 - **Apt Packages:** Edit `config.yml` — add/remove packages under `apt:` (installed during Docker build as root)
@@ -48,35 +62,39 @@ simple-agent-sandbox/
 - **Mounts in Compose:** Volume mounts are defined in `docker-compose.yml`, not parsed from config.yml by helper scripts
 
 ### Docker Workflow
+
 - **Real compose over helpers:** The source of truth for volumes, env, and service config is `docker-compose.yml`. The helper scripts (`run.sh`, `build.sh`) are thin wrappers around `docker compose`.
 - **Rebuild After Config Changes:** If `config.yml` changes, rebuild with `docker compose build`
-- **Container User:** Container runs as the `sandbox` user (non-root) with password-less sudo access
+- **Container User:** Container runs as the `sandbox` user (non-root) with sudo access (password required, default: "sandbox")
 - **Persistent State:** All persistent data lives in `./persist` on the host, mounted at `/persist` in the container
 - **No State in Image:** Do not store credentials, keys, or session data in the Docker image layers
 
 ### Operational Constraints
+
 - **No Interactive Prompts:** Mock or bypass any interactive commands in install scripts
 - **No Git Operations:** Don't stage/commit unless explicitly requested
 - **Keep Instructions Current:** Update "Tech Stack," "Project Structure," and "Workflow Commands" if the Dockerfile, config format, or core tooling changes
 
 ## Workflow Commands
+
 ```bash
 cp config.example.yml config.yml                # Create real config from template
 cp docker-compose.example.yml docker-compose.yml # Create real compose from template
-docker compose build                             # Rebuild the sandbox image
+docker compose build                             # Rebuild the sandbox image (prompts for sudo password)
 docker compose run --rm sandbox                  # Interactive shell in sandbox
 docker compose up -d && docker compose exec sandbox bash  # Persistent session
 ```
 
 ## Agents
 
-All CLIs listed below offer usable free plans.
+All CLIs listed below offer usable **free** plans.
 
-| Agent | Description | Notes |
-|-------|-------------|-------|
-| [Hermes Agent](https://hermes-agent.nousresearch.com/) | Free models via API with [OpenRouter](https://openrouter.ai) or [Nvidia](https://build.nvidia.com) | Install is large and takes a while |
-| [Cline](https://cline.bot/) | Offers a free plan with decent LLM models | Heavy install |
-| [Devin CLI](https://cli.devin.ai/) | Offers free plan with decent LLM model | Lightweight install |
+| Agent                                                  | Description                                                                                        | Notes          | Recommendation 2026-07-12 |
+| ------------------------------------------------------ | -------------------------------------------------------------------------------------------------- | -------------- | ------------------------- |
+| [Hermes Agent](https://hermes-agent.nousresearch.com/) | Free models via API with [OpenRouter](https://openrouter.ai) or [Nvidia](https://build.nvidia.com) | Heavy Install  | openrouter/hy3            |
+| [Cline CLI](https://cline.bot/)                            | Offers a free plan with decent LLM models                                                          | Medium install | deepseek-v4-flash         |
+| [Devin CLI](https://cli.devin.ai/)                     | Offers free plan with decent LLM model                                                             | Light install  | swe-1.6                   |
+| [OpenCode CLI](https://opencode.ai)                        | Offers decent free models via OpenCode Zen                                                         | Light install  | big-pickle                |
 
 ## Data Persistence
 
@@ -95,6 +113,8 @@ If you want personal shell customizations (aliases, functions, env vars) that wo
 
 - [Docker](https://docs.docker.com/get-docker/)
 - [Docker Compose](https://docs.docker.com/compose/install/)
+
+**Note:** The sandbox user requires a password for sudo operations. The default password is `sandbox`. You can set a custom password during the build process when prompted.
 
 ## Quick Pull (Pre-built Image)
 
@@ -122,10 +142,12 @@ IMAGE=alexandrewsai/simple-agent-sandbox:latest docker compose run --rm sandbox
 
 ## Environment Variables
 
-| Variable | Value | Description |
-|----------|-------|-------------|
-| `HOME` | `/persist` | Sets the home directory inside the container |
-| `PATH` | `/persist/.local/bin:$PATH` | Ensures installed binaries are available |
+| Variable   | Value                                                                                                                                        | Description                                                     |
+| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| `HOME`     | `/persist`                                                                                                                                   | Sets the home directory inside the container                    |
+| `PATH`     | `/home/sandbox/.opencode/bin:/home/sandbox/.local/bin:/persist/.local/bin:/usr/local/bin:/usr/bin:/bin:/home/sandbox/node_modules/cline/bin` | Ensures installed binaries from various locations are available |
+| `USER_UID` | `${UID:-1000}`                                                                                                                               | User ID for the sandbox user (default: 1000)                    |
+| `USER_GID` | `${GID:-1000}`                                                                                                                               | Group ID for the sandbox user (default: 1000)                   |
 
 ## Troubleshooting
 

@@ -1,3 +1,5 @@
+# Persist Directory
+
 - `.bashrc` is managed in this directory and sourced at container startup
 - Use `bashrc-extra` file to add your own customizations (aliases, functions, env vars)
 - The `bashrc-extra` file is gitignored, so your customizations stay local to your environment

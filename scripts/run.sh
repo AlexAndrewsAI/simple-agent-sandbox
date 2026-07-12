@@ -1,5 +1,6 @@
 #!/bin/bash
 # run.sh - Start an interactive shell inside the sandbox container
+set -euo pipefail
 cd "$(dirname "$0")/.." || exit
 
 # --- Prerequisite: config files ----------------------------------------------

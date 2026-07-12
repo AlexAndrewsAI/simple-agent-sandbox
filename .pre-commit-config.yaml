@@ -1,0 +1,35 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-yaml
+        name: Check YAML files
+      - id: check-toml
+        name: Check TOML files
+      - id: end-of-file-fixer
+        name: Fix end of files
+      - id: check-added-large-files
+        name: Check for large files
+        args: ['--maxkb=1000']
+      - id: trailing-whitespace
+        name: Trim trailing whitespace
+
+  - repo: https://github.com/hadolint/hadolint
+    rev: v2.12.0
+    hooks:
+      - id: hadolint-docker
+        name: Lint Dockerfiles with hadolint
+
+  - repo: local
+    hooks:
+      - id: pymarkdownlnt
+        name: Lint Markdown with pymarkdownlnt
+        entry: uv run pymarkdown -c .pymarkdown.json scan  # Read-only: --fix can break tables, links, and intentional formatting
+        language: system
+        types: [markdown]
+
+      - id: shellcheck
+        name: Lint shell scripts with shellcheck
+        entry: uv run shellcheck -x
+        language: system
+        files: \.(sh|bash)$

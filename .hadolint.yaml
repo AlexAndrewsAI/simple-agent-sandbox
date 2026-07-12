@@ -1,0 +1,7 @@
+# Hadolint configuration for simple-agent-sandbox
+# https://github.com/hadolint/hadolint
+
+# Ignored rules:
+# DL3008: Pin versions in apt get install (overkill for dev environment)
+ignored:
+  - DL3008
