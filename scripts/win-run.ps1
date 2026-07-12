@@ -3,4 +3,4 @@
 # --- Prerequisite: config files ----------------------------------------------
 . "$PSScriptRoot\_config_check.ps1"
 
-docker compose run --rm sandbox
+docker compose run --rm sandbox bash

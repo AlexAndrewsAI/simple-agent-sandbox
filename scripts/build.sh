@@ -6,4 +6,11 @@ cd "$(dirname "$0")/.." || exit
 # --- Prerequisite: config files ----------------------------------------------
 source scripts/_config_check.sh
 
-docker compose build --progress=plain "$@"
+if command -v docker &>/dev/null && docker compose version &>/dev/null; then
+  docker compose build --progress=plain "$@"
+elif command -v docker-compose &>/dev/null; then
+  docker-compose build --progress=plain "$@"
+else
+  echo "Error: neither 'docker compose' nor 'docker-compose' is installed" >&2
+  exit 1
+fi
