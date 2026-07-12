@@ -17,16 +17,16 @@ A Docker-based sandbox environment for running AI agents. Mounts `./persist` dir
 
 ## Tech Stack
 
-| Component | Tool |
-|-----------|------|
-| Container Runtime | Docker & Docker Compose |
-| Base Image | python:3-trixie |
-| Config Format | YAML (read via yq) |
-| Shell | Bash |
-| Package Manager | npm (for Cline), curl-based installers |
-| Markdown Lint | pymarkdownlnt |
-| Shell Script Lint | shellcheck |
-| Git Hooks | prek |
+| Component         | Tool                                   |
+| ----------------- | -------------------------------------- |
+| Container Runtime | Docker & Docker Compose                |
+| Base Image        | python:3-trixie                        |
+| Config Format     | YAML (read via yq)                     |
+| Shell             | Bash                                   |
+| Package Manager   | npm (for Cline), curl-based installers |
+| Markdown Lint     | pymarkdownlnt                          |
+| Shell Script Lint | shellcheck                             |
+| Git Hooks         | prek                                   |
 
 ## Project Structure
 
@@ -89,12 +89,12 @@ docker compose up -d && docker compose exec sandbox bash  # Persistent session
 
 All CLIs listed below offer usable free plans.
 
-| Agent | Description | Notes |
-|-------|-------------|-------|
+| Agent                                                  | Description                                                                                        | Notes                              |
+| ------------------------------------------------------ | -------------------------------------------------------------------------------------------------- | ---------------------------------- |
 | [Hermes Agent](https://hermes-agent.nousresearch.com/) | Free models via API with [OpenRouter](https://openrouter.ai) or [Nvidia](https://build.nvidia.com) | Install is large and takes a while |
-| [Cline](https://cline.bot/) | Offers a free plan with decent LLM models | Heavy install |
-| [Devin CLI](https://cli.devin.ai/) | Offers free plan with decent LLM model | Lightweight install |
-| [OpenCode](https://opencode.ai) | Offers decent free models via OpenCode Zen | Lightweight install |
+| [Cline](https://cline.bot/)                            | Offers a free plan with decent LLM models                                                          | Heavy install                      |
+| [Devin CLI](https://cli.devin.ai/)                     | Offers free plan with decent LLM model                                                             | Lightweight install                |
+| [OpenCode](https://opencode.ai)                        | Offers decent free models via OpenCode Zen                                                         | Lightweight install                |
 
 ## Data Persistence
 
@@ -142,12 +142,12 @@ IMAGE=alexandrewsai/simple-agent-sandbox:latest docker compose run --rm sandbox
 
 ## Environment Variables
 
-| Variable | Value | Description |
-|----------|-------|-------------|
-| `HOME` | `/persist` | Sets the home directory inside the container |
-| `PATH` | `/home/sandbox/.opencode/bin:/home/sandbox/.local/bin:/persist/.local/bin:/usr/local/bin:/usr/bin:/bin:/home/sandbox/node_modules/cline/bin` | Ensures installed binaries from various locations are available |
-| `USER_UID` | `${UID:-1000}` | User ID for the sandbox user (default: 1000) |
-| `USER_GID` | `${GID:-1000}` | Group ID for the sandbox user (default: 1000) |
+| Variable   | Value                                                                                                                                        | Description                                                     |
+| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| `HOME`     | `/persist`                                                                                                                                   | Sets the home directory inside the container                    |
+| `PATH`     | `/home/sandbox/.opencode/bin:/home/sandbox/.local/bin:/persist/.local/bin:/usr/local/bin:/usr/bin:/bin:/home/sandbox/node_modules/cline/bin` | Ensures installed binaries from various locations are available |
+| `USER_UID` | `${UID:-1000}`                                                                                                                               | User ID for the sandbox user (default: 1000)                    |
+| `USER_GID` | `${GID:-1000}`                                                                                                                               | Group ID for the sandbox user (default: 1000)                   |
 
 ## Troubleshooting
 
