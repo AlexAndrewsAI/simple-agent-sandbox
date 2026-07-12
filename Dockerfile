@@ -11,9 +11,10 @@ ARG USER_GID=1000
 ARG SANDBOX_PASSWORD=sandbox
 
 # Install Node.js 22+ (required by Cline) from NodeSource
+# yq is the Debian (Python/jq wrapper) package; pinned to a known version.
 RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
   && apt-get install -y --no-install-recommends \
-    ca-certificates curl git bash xz-utils tar nodejs yq \
+    ca-certificates curl git bash xz-utils tar nodejs yq=3.4.3-2 \
   && rm -rf /var/lib/apt/lists/*
 
 COPY config.yml /tmp/config.yml
@@ -21,8 +22,8 @@ COPY config.yml /tmp/config.yml
 # Install apt packages from config.yml (if any)
 RUN if [ -f /tmp/config.yml ] && yq '.apt' /tmp/config.yml &>/dev/null; then \
       apt-get update && \
-      PACKAGES=$(yq '.apt[]' /tmp/config.yml | tr '\n' ' ') && \
-      apt-get install -y --no-install-recommends "$PACKAGES" && \
+      mapfile -t PACKAGES < <(yq -r '.apt[]' /tmp/config.yml) && \
+      apt-get install -y --no-install-recommends "${PACKAGES[@]}" && \
       rm -rf /var/lib/apt/lists/*; \
     fi
 

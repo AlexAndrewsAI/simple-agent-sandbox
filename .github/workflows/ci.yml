@@ -51,7 +51,7 @@ jobs:
           yq '.' config.example.yml > /dev/null
 
           echo "Checking apt list is non-empty..."
-          apt_count=$(yq '.apt | length' config.example.yml)
+          apt_count=$(yq -r '.apt | length' config.example.yml)
           if [ "$apt_count" -eq 0 ]; then
             echo "ERROR: no apt packages found" >&2
             exit 1
@@ -59,15 +59,15 @@ jobs:
           echo "Apt packages: $apt_count"
 
           echo "Checking install keys are non-empty..."
-          count=$(yq '.install | length' config.example.yml)
+          count=$(yq -r '.install | length' config.example.yml)
           if [ "$count" -eq 0 ]; then
             echo "ERROR: no install entries found" >&2
             exit 1
           fi
           echo "Install entries: $count"
           for i in $(seq 0 $((count - 1))); do
-            key=$(yq ".install | keys[$i]" config.example.yml)
-            cmd=$(yq ".install.$key" config.example.yml)
+            key=$(yq -r ".install | keys[$i]" config.example.yml)
+            cmd=$(yq -r ".install.$key" config.example.yml)
             if [ -z "$cmd" ] || [ "$cmd" = "null" ]; then
               echo "ERROR: empty command for $key" >&2
               exit 1
