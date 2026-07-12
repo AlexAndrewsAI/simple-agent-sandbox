@@ -27,6 +27,13 @@ RUN if [ -f /tmp/config.yml ] && yq '.apt' /tmp/config.yml &>/dev/null; then \
       rm -rf /var/lib/apt/lists/*; \
     fi
 
+# Install uv system-wide (tool manager for Python tools like pytest, ruff, mypy)
+# Using pip directly is more reliable than the astral.sh | sh installer in
+# constrained build environments. The --break-system-packages flag is needed
+# on PEP 668 (externally-managed) Python environments like Debian Trixie.
+# Version pinned for reproducibility (0.5.31 is the latest stable release).
+RUN pip install --no-cache-dir --break-system-packages "uv==0.5.31"
+
 # Create a non-root user that matches the host UID/GID
 RUN groupadd --gid ${USER_GID} sandbox \
   && useradd --uid ${USER_UID} --gid ${USER_GID} --create-home --shell /bin/bash sandbox \
