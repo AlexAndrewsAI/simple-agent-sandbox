@@ -32,7 +32,7 @@ repos:
 
       - id: pymarkdownlnt
         name: Lint Markdown with pymarkdownlnt
-        entry: uv run pymarkdown -c .pymarkdown.json scan
+        entry: uv run pymarkdown -c .pymarkdown.json scan  # Read-only: --fix can break tables, links, and intentional formatting
         language: system
         types: [markdown]
 
