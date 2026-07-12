@@ -23,7 +23,7 @@ devnullredirect () {
     "$@" 2>/dev/null
 }
 function f {
-    devnullredirect find . -iname $@
+    devnullredirect find . -iname "$1" "${@:2}"
 }
 
 alias uv-tests="source .venv/bin/activate; uv sync --dev; uv run ruff format; uv run ruff check --fix; uv run pytest; mypy ."
