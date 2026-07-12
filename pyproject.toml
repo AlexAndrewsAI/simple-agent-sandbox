@@ -23,6 +23,8 @@ classifiers = [
 [dependency-groups]
 dev = [
     "prek>=0.4.8",
+    "pymarkdownlnt",
+    "ruff",
     "shellcheck-py>=0.11.0.1",
 ]
 
@@ -30,3 +32,30 @@ dev = [
 Homepage = "https://github.com/AlexAndrewsAI/simple-agent-sandbox"
 Repository = "https://github.com/AlexAndrewsAI/simple-agent-sandbox.git"
 Documentation = "https://github.com/AlexAndrewsAI/simple-agent-sandbox#readme"
+
+[tool.uv]
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "F",   # pyflakes (undefined names, unused imports)
+    "W",   # pycodestyle warnings
+    "D",   # pydocstyle (docstring conventions)
+    "S",   # flake8-bandit (security checks)
+    "B",   # flake8-bugbear (common bugs)
+    "I",   # isort (import sorting)
+    "G",   # flake8-logging-format (logging format)
+    "C4",  # flake8-comprehensions (comprehension optimizations)
+    "PT",  # flake8-pytest-style (pytest conventions)
+    "UP",  # pyupgrade (modernize Python syntax)
+    "ARG", # flake8-unused-arguments (unused function arguments)
+    "RUF", # ruff-specific rules
+    "SIM", # flake8-simplify (code simplification)
+]
+ignore = ["D203", "D213"]  # Ignore conflicting docstring style rules (one-blank-line-before-class vs multi-line-summary)
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101"]  # Allow assert statements in tests
