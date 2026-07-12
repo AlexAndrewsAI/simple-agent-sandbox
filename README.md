@@ -24,7 +24,6 @@ A Docker-based sandbox environment for running AI agents. Mounts `./persist` dir
 | Config Format | YAML (read via yq) |
 | Shell | Bash |
 | Package Manager | npm (for Cline), curl-based installers |
-| Linting & Formatting | ruff |
 | Markdown Lint | pymarkdownlnt |
 | Shell Script Lint | shellcheck |
 | Git Hooks | prek |

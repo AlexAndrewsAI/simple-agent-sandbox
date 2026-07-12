@@ -16,20 +16,6 @@ repos:
 
   - repo: local
     hooks:
-      - id: ruff
-        name: Lint with ruff
-        entry: uv run ruff check . --fix
-        language: system
-        pass_filenames: false
-        always_run: true
-
-      - id: ruff-format
-        name: Format with ruff
-        entry: uv run ruff format .
-        language: system
-        pass_filenames: false
-        always_run: true
-
       - id: pymarkdownlnt
         name: Lint Markdown with pymarkdownlnt
         entry: uv run pymarkdown -c .pymarkdown.json scan  # Read-only: --fix can break tables, links, and intentional formatting
