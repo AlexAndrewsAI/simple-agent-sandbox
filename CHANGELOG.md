@@ -19,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Updated dev dependencies: added ruff and pymarkdownlnt
+- Updated dev dependencies: added ruff, pymarkdownlnt, and shellcheck-py
 
 ## [0.1.0] - 2026-06-23
 
