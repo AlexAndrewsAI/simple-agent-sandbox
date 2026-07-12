@@ -57,7 +57,7 @@ simple-agent-sandbox/
 
 - **Real compose over helpers:** The source of truth for volumes, env, and service config is `docker-compose.yml`. The helper scripts (`run.sh`, `build.sh`) are thin wrappers around `docker compose`.
 - **Rebuild After Config Changes:** If `config.yml` changes, rebuild with `docker compose build`
-- **Container User:** Container runs as the `sandbox` user (non-root) with password-less sudo access
+- **Container User:** Container runs as the `sandbox` user (non-root) with sudo access (password required, default: "sandbox")
 - **Persistent State:** All persistent data lives in `./persist` on the host, mounted at `/persist` in the container
 - **No State in Image:** Do not store credentials, keys, or session data in the Docker image layers
 
@@ -72,7 +72,7 @@ simple-agent-sandbox/
 ```bash
 cp config.example.yml config.yml                # Create real config from template
 cp docker-compose.example.yml docker-compose.yml # Create real compose from template
-docker compose build                             # Rebuild the sandbox image
+docker compose build                             # Rebuild the sandbox image (prompts for sudo password)
 docker compose run --rm sandbox                  # Interactive shell in sandbox
 docker compose up -d && docker compose exec sandbox bash  # Persistent session
 ```
@@ -105,6 +105,8 @@ If you want personal shell customizations (aliases, functions, env vars) that wo
 
 - [Docker](https://docs.docker.com/get-docker/)
 - [Docker Compose](https://docs.docker.com/compose/install/)
+
+**Note:** The sandbox user requires a password for sudo operations. The default password is `sandbox`. You can set a custom password during the build process when prompted.
 
 ## Quick Pull (Pre-built Image)
 

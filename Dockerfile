@@ -2,9 +2,10 @@
 # apt-get compilation of native deps during agent installs.
 FROM python:3-trixie
 
-# Build args for matching host user UID/GID
+# Build args for matching host user UID/GID and sandbox password
 ARG USER_UID=1000
 ARG USER_GID=1000
+ARG SANDBOX_PASSWORD=sandbox
 
 # Install Node.js 22+ (required by Cline) from NodeSource
 RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
@@ -24,13 +25,14 @@ RUN if [ -f /tmp/config.yml ] && yq '.apt' /tmp/config.yml &>/dev/null; then \
 
 # Create a non-root user that matches the host UID/GID
 RUN groupadd --gid ${USER_GID} sandbox \
-  && useradd --uid ${USER_UID} --gid ${USER_GID} --create-home --shell /bin/bash sandbox
+  && useradd --uid ${USER_UID} --gid ${USER_GID} --create-home --shell /bin/bash sandbox \
+  && echo "sandbox:${SANDBOX_PASSWORD}" | chpasswd
 
-# Install sudo and give sandbox user password-less sudo access
+# Install sudo for sandbox user (password required)
 RUN apt-get update && \
       apt-get install -y --no-install-recommends sudo \
       && rm -rf /var/lib/apt/lists/* && \
-      echo "sandbox ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/sandbox && \
+      echo "sandbox ALL=(ALL) ALL" > /etc/sudoers.d/sandbox && \
       chmod 0440 /etc/sudoers.d/sandbox
 
 COPY scripts/installer.sh /usr/local/bin/installer.sh

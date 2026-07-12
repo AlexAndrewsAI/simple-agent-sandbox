@@ -53,7 +53,7 @@ simple-agent-sandbox/
 
 - **Real compose over helpers:** The source of truth for volumes, env, and service config is `docker-compose.yml`. The helper scripts (`run.sh`, `build.sh`) are thin wrappers around `docker compose`.
 - **Rebuild After Config Changes:** If `config.yml` changes, rebuild with `docker compose build`
-- **Container User:** Container runs as the `sandbox` user (non-root) with password-less sudo access
+- **Container User:** Container runs as the `sandbox` user (non-root) with sudo access (password required)
 - **Persistent State:** All persistent data lives in `./persist` on the host, mounted at `/persist` in the container
 - **No State in Image:** Do not store credentials, keys, or session data in the Docker image layers
 
