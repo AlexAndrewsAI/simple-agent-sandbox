@@ -42,9 +42,8 @@ jobs:
 
       - name: Install yq
         run: |
-          YQ_VERSION=$(grep 'ARG YQ_VERSION=' Dockerfile | sed 's/.*=//')
-          curl -fsSL "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64" -o /usr/local/bin/yq
-          chmod +x /usr/local/bin/yq
+          sudo apt-get update
+          sudo apt-get install -y yq
 
       - name: Lint config.example.yml
         run: |
@@ -85,9 +84,8 @@ jobs:
 
       - name: Install yq
         run: |
-          YQ_VERSION=$(grep 'ARG YQ_VERSION=' Dockerfile | sed 's/.*=//')
-          curl -fsSL "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64" -o /usr/local/bin/yq
-          chmod +x /usr/local/bin/yq
+          sudo apt-get update
+          sudo apt-get install -y yq
 
       - name: Syntax check installer.sh
         run: bash -n scripts/installer.sh

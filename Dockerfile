@@ -9,12 +9,8 @@ ARG USER_GID=1000
 # Install Node.js 22+ (required by Cline) from NodeSource
 RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
   && apt-get install -y --no-install-recommends \
-    ca-certificates curl git bash xz-utils tar nodejs \
+    ca-certificates curl git bash xz-utils tar nodejs yq \
   && rm -rf /var/lib/apt/lists/*
-
-ARG YQ_VERSION=v4.44.6
-RUN curl -fsSL "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64" -o /usr/local/bin/yq \
-  && chmod +x /usr/local/bin/yq
 
 COPY config.yml /tmp/config.yml
 
@@ -54,6 +50,6 @@ RUN mkdir -p /home/sandbox/.npm-global
 
 RUN installer.sh
 
-ENV PATH="/home/sandbox/.opencode/bin:/home/sandbox/node_modules/cline/bin:/home/sandbox/.npm-global/bin:/persist/.local/bin:/home/sandbox/.local/bin:/home/sandbox/.cargo/bin:/root/.local/bin:/root/.bun/bin:/usr/local/bin:${PATH}"
+ENV PATH="/home/sandbox/.opencode/bin:/home/sandbox/node_modules/cline/bin:/home/sandbox/.npm-global/bin:/home/sandbox/.local/bin:/persist/.local/bin:/usr/local/bin:/usr/bin:/bin"
 
 CMD ["bash"]
