@@ -59,42 +59,49 @@ validate_command() {
   return 1
 }
 
-# Count of install entries
-count=$(yq '.install | length' /tmp/config.yml)
+# Only run the installer when executed directly; when sourced (e.g. for
+# unit-testing validate_command) skip the main body so it doesn't read
+# /tmp/config.yml or call exit.
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
 
-if [ "$count" -eq 0 ]; then
-  echo "No install entries found in config.yml"
-  exit 0
-fi
+  # Count of install entries
+  count=$(yq '.install | length' /tmp/config.yml)
 
-# Iterate over each key in .install
-for i in $(seq 0 $((count - 1))); do
-  key=$(yq ".install | keys[$i]" /tmp/config.yml)
-  cmd=$(yq ".install.$key" /tmp/config.yml)
-
-  echo "Installing $key: $cmd"
-
-  # Validate command safety before execution
-  if ! validate_command "$cmd"; then
-    echo "ERROR: $key command failed validation" >&2
-    exit 1
+  if [ "$count" -eq 0 ]; then
+    echo "No install entries found in config.yml"
+    exit 0
   fi
 
-  # Run the install command. If it fails, check whether the tool binary
-  # already exists on PATH — if so, skip with a warning; otherwise propagate
-  # the error so set -e aborts the build.
-  if ! eval "$cmd"; then
-    if command -v "$key" &>/dev/null; then
-      echo "$key install reported failure but binary is present — skipping"
-    else
-      echo "ERROR: $key install failed and binary not found" >&2
+  # Iterate over each key in .install
+  for i in $(seq 0 $((count - 1))); do
+    key=$(yq ".install | keys[$i]" /tmp/config.yml)
+    cmd=$(yq ".install.$key" /tmp/config.yml)
+
+    echo "Installing $key: $cmd"
+
+    # Validate command safety before execution
+    if ! validate_command "$cmd"; then
+      echo "ERROR: $key command failed validation" >&2
       exit 1
     fi
-  fi
 
-  echo "$key install complete"
-  installed_path=$(command -v "$key" || true)
-  if [ -n "$installed_path" ]; then
-    echo "Installed at: $installed_path"
-  fi
-done
+    # Run the install command. If it fails, check whether the tool binary
+    # already exists on PATH — if so, skip with a warning; otherwise propagate
+    # the error so set -e aborts the build.
+    if ! eval "$cmd"; then
+      if command -v "$key" &>/dev/null; then
+        echo "$key install reported failure but binary is present — skipping"
+      else
+        echo "ERROR: $key install failed and binary not found" >&2
+        exit 1
+      fi
+    fi
+
+    echo "$key install complete"
+    installed_path=$(command -v "$key" || true)
+    if [ -n "$installed_path" ]; then
+      echo "Installed at: $installed_path"
+    fi
+  done
+
+fi
