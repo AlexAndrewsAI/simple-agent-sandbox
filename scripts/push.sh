@@ -1,6 +1,5 @@
 #!/bin/bash
-# push.sh - Tag HEAD with the current version and push to origin.
-# Also moves the "latest" tag to HEAD and pushes it.
+# push.sh - Build and push Docker image to Docker Hub with version and latest tags.
 # Usage: ./scripts/push.sh [--dry-run]
 set -euo pipefail
 
@@ -11,6 +10,9 @@ if [[ "${1:-}" == "--dry-run" ]]; then
   DRY_RUN=true
   echo "[DRY-RUN] No commands will be executed"
 fi
+
+# Image config
+IMAGE="alexandrewsai/simple-agent-sandbox"
 
 # --- Read version ------------------------------------------------------------
 if [ ! -f pyproject.toml ]; then
@@ -24,62 +26,63 @@ if [ -z "$VERSION" ]; then
   exit 1
 fi
 
-TAG="v$VERSION"
+echo "Image:  $IMAGE"
 echo "Version: $VERSION"
-echo "Tag:     $TAG"
+echo "Tags:   $VERSION, latest"
 echo ""
 
-# --- Create version tag at HEAD ----------------------------------------------
-if git rev-parse "$TAG" &>/dev/null; then
-  echo "Tag $TAG already exists locally at $(git rev-parse --short "$TAG") — skipping creation"
-else
-  echo "Creating tag $TAG at HEAD..."
-  $DRY_RUN || git tag "$TAG"
-fi
-
-# --- Push branch and version tag ---------------------------------------------
-echo "Pushing branch and tag $TAG to origin..."
+# --- Build the image ---------------------------------------------------------
+echo "Building $IMAGE:$VERSION ..."
 if $DRY_RUN; then
-  echo "  git push origin HEAD --follow-tags"
+  echo "  docker compose build"
 else
-  if ! git push origin HEAD --follow-tags 2>&1; then
+  if ! docker compose build 2>&1; then
     echo ""
     echo "============================================================"
-    echo "  Push failed! You may need to sign in first."
-    echo ""
-    echo "  Options:"
-    echo "    gh auth login         # GitHub CLI login"
-    echo "    git push and enter credentials"
+    echo "  Build failed."
     echo "============================================================"
     exit 1
   fi
 fi
 
-# --- Move "latest" tag to HEAD ------------------------------------------------
-echo "Moving 'latest' tag to HEAD..."
+# --- Tag with version --------------------------------------------------------
+echo "Tagging $IMAGE:$VERSION ..."
 if $DRY_RUN; then
-  echo "  git tag -d latest 2>/dev/null; git tag latest"
-  echo "  git push origin :latest 2>/dev/null; git push origin latest"
+  echo "  docker tag $IMAGE:latest $IMAGE:$VERSION"
 else
-  # Delete local latest if it exists
-  if git rev-parse latest &>/dev/null; then
-    git tag -d latest
-  fi
-  git tag latest
-  # Delete remote latest if it exists, then push the new one
-  git push origin :latest 2>/dev/null || true
-  if ! git push origin latest 2>&1; then
+  docker tag "$IMAGE:latest" "$IMAGE:$VERSION"
+fi
+
+# --- Push both tags to Docker Hub --------------------------------------------
+echo "Pushing $IMAGE:$VERSION ..."
+if $DRY_RUN; then
+  echo "  docker push $IMAGE:$VERSION"
+else
+  if ! docker push "$IMAGE:$VERSION" 2>&1; then
     echo ""
     echo "============================================================"
-    echo "  Push failed! You may need to sign in first."
+    echo "  Push failed! You may need to sign in to Docker Hub first."
     echo ""
-    echo "  Options:"
-    echo "    gh auth login         # GitHub CLI login"
-    echo "    git push and enter credentials"
+    echo "  Run: docker login"
+    echo "============================================================"
+    exit 1
+  fi
+fi
+
+echo "Pushing $IMAGE:latest ..."
+if $DRY_RUN; then
+  echo "  docker push $IMAGE:latest"
+else
+  if ! docker push "$IMAGE:latest" 2>&1; then
+    echo ""
+    echo "============================================================"
+    echo "  Push failed! You may need to sign in to Docker Hub first."
+    echo ""
+    echo "  Run: docker login"
     echo "============================================================"
     exit 1
   fi
 fi
 
 echo ""
-echo "Done. Pushed $TAG and updated 'latest' tag on origin."
+echo "Done. Pushed $IMAGE:$VERSION and $IMAGE:latest to Docker Hub."
