@@ -84,5 +84,4 @@ temp.*
 persist/
 
 # Real config files (use templates in build)
-config.yml
 docker-compose.yml
