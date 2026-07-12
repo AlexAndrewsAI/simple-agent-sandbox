@@ -85,15 +85,16 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
       exit 1
     fi
 
-    # Run the install command. If it fails, check whether the tool binary
-    # already exists on PATH — if so, skip with a warning; otherwise propagate
-    # the error so set -e aborts the build.
+    # Run the install command. A failed install of a single optional tool
+    # must not abort the whole image build. If it fails, check whether the
+    # tool binary already exists on PATH — if so, skip with a warning.
+    # Otherwise warn and continue so one flaky/optional tool cannot break the
+    # entire sandbox image. Security validation above remains fatal.
     if ! eval "$cmd"; then
       if command -v "$key" &>/dev/null; then
         echo "$key install reported failure but binary is present — skipping"
       else
-        echo "ERROR: $key install failed and binary not found" >&2
-        exit 1
+        echo "WARNING: $key install failed and binary not found — continuing" >&2
       fi
     fi
 
