@@ -25,6 +25,9 @@
 
 ```text
 simple-agent-sandbox/
+  ├── .github/
+  │   └── workflows/
+  │       └── ci.yml                (CI pipeline for linting and validation)
   ├── Dockerfile                    (Container build instructions)
   ├── docker-compose.example.yml    (Template)
   ├── docker-compose.yml            (Real compose file — gitignored)
@@ -32,9 +35,11 @@ simple-agent-sandbox/
   ├── config.yml                    (Real config — gitignored)
   ├── scripts/
   │   ├── installer.sh              (Reads config.yml, runs install commands)
-  │   ├── run.sh / run.ps1          (Start interactive sandbox shell)
-  │   └── build.sh / build.ps1      (Build the Docker image)
+  │   ├── run.sh / win-run.ps1      (Start interactive sandbox shell)
+  │   └── build.sh / win-build.ps1  (Build the Docker image)
   ├── persist/                      (Mounted volume for persistent state, gitignored)
+  ├── AGENTS.md                     (Agent-specific instructions)
+  ├── CHANGELOG.md                  (Project changelog)
   └── README.md
 ```
 

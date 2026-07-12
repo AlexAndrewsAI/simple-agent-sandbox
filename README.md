@@ -24,11 +24,18 @@ A Docker-based sandbox environment for running AI agents. Mounts `./persist` dir
 | Config Format | YAML (read via yq) |
 | Shell | Bash |
 | Package Manager | npm (for Cline), curl-based installers |
+| Linting & Formatting | ruff |
+| Markdown Lint | pymarkdownlnt |
+| Shell Script Lint | shellcheck |
+| Git Hooks | prek |
 
 ## Project Structure
 
 ```text
 simple-agent-sandbox/
+  ├── .github/
+  │   └── workflows/
+  │       └── ci.yml                (CI pipeline for linting and validation)
   ├── Dockerfile                    (Container build instructions)
   ├── docker-compose.example.yml    (Template — copy to docker-compose.yml)
   ├── docker-compose.yml            (Real compose file — gitignored)
@@ -36,9 +43,11 @@ simple-agent-sandbox/
   ├── config.yml                    (Real config — gitignored)
   ├── scripts/
   │   ├── installer.sh              (Reads config.yml, runs install commands)
-  │   ├── run.sh / run.ps1          (Start interactive sandbox shell)
-  │   └── build.sh / build.ps1      (Build the Docker image)
+  │   ├── run.sh / win-run.ps1      (Start interactive sandbox shell)
+  │   └── build.sh / win-build.ps1  (Build the Docker image)
   ├── persist/                      (Mounted volume for persistent state, gitignored)
+  ├── AGENTS.md                     (Agent-specific instructions)
+  ├── CHANGELOG.md                  (Project changelog)
   └── README.md
 ```
 
@@ -137,7 +146,9 @@ IMAGE=alexandrewsai/simple-agent-sandbox:latest docker compose run --rm sandbox
 | Variable | Value | Description |
 |----------|-------|-------------|
 | `HOME` | `/persist` | Sets the home directory inside the container |
-| `PATH` | `/persist/.local/bin:$PATH` | Ensures installed binaries are available |
+| `PATH` | `/home/sandbox/.opencode/bin:/home/sandbox/.local/bin:/persist/.local/bin:/usr/local/bin:/usr/bin:/bin:/home/sandbox/node_modules/cline/bin` | Ensures installed binaries from various locations are available |
+| `USER_UID` | `${UID:-1000}` | User ID for the sandbox user (default: 1000) |
+| `USER_GID` | `${GID:-1000}` | Group ID for the sandbox user (default: 1000) |
 
 ## Troubleshooting
 
