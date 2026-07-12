@@ -1,7 +1,9 @@
 # Install list — each key maps to its install command
+# Note: uv is already installed system-wide via pip in the Dockerfile (line 35),
+# so it does not need an install entry here. Entries below use uv to manage
+# Python dev tools.
 install:
-  # Useful Python dev packages
-  uv: "curl -LsSf https://astral.sh/uv/install.sh | sh"
+  # Useful Python dev packages (managed via uv, installed by Dockerfile)
   pytest: "uv tool install pytest"
   ruff: "uv tool install ruff"
   mypy: "uv tool install mypy"

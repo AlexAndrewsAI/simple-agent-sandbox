@@ -57,8 +57,8 @@ USER sandbox
 ENV HOME=/home/sandbox
 WORKDIR /home/sandbox
 
-RUN mkdir -p /home/sandbox/.npm-global && installer.sh
-
 ENV PATH="/home/sandbox/.opencode/bin:/home/sandbox/node_modules/cline/bin:/home/sandbox/.npm-global/bin:/home/sandbox/.local/bin:/persist/.local/bin:/usr/local/bin:/usr/bin:/bin"
+
+RUN mkdir -p /home/sandbox/.npm-global && installer.sh
 
 CMD ["bash"]
