@@ -113,5 +113,22 @@ jobs:
           cp config.example.yml config.yml
           cp docker-compose.example.yml docker-compose.yml
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Cache Docker layers
+        uses: actions/cache@v4
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
       - name: Build sandbox image
-        run: docker compose build --progress=plain
+        run: |
+          docker compose build \
+            --build-arg BUILDKIT_INLINE_CACHE=1 \
+            --cache-from type=local,src=/tmp/.buildx-cache \
+            --cache-to type=local,dest=/tmp/.buildx-cache-new \
+            --progress=plain
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
