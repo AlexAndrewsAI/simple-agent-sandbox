@@ -26,6 +26,8 @@ temp.*
 !.env.example
 !.pre-commit-config.yaml
 !.pymarkdown.json
+!.hadolint.yaml
+!.dockerignore
 
 # AI Agent Outputs & State Files
 agent_artifacts/

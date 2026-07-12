@@ -14,6 +14,12 @@ repos:
       - id: trailing-whitespace
         name: Trim trailing whitespace
 
+  - repo: https://github.com/hadolint/hadolint
+    rev: v2.12.0
+    hooks:
+      - id: hadolint-docker
+        name: Lint Dockerfiles with hadolint
+
   - repo: local
     hooks:
       - id: pymarkdownlnt

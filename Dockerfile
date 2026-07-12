@@ -2,6 +2,9 @@
 # apt-get compilation of native deps during agent installs.
 FROM python:3-trixie
 
+# Set shell options for better error handling in piped commands
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
 # Build args for matching host user UID/GID and sandbox password
 ARG USER_UID=1000
 ARG USER_GID=1000
@@ -19,7 +22,7 @@ COPY config.yml /tmp/config.yml
 RUN if [ -f /tmp/config.yml ] && yq '.apt' /tmp/config.yml &>/dev/null; then \
       apt-get update && \
       PACKAGES=$(yq '.apt[]' /tmp/config.yml | tr '\n' ' ') && \
-      apt-get install -y --no-install-recommends $PACKAGES && \
+      apt-get install -y --no-install-recommends "$PACKAGES" && \
       rm -rf /var/lib/apt/lists/*; \
     fi
 
@@ -38,19 +41,15 @@ RUN apt-get update && \
 COPY scripts/installer.sh /usr/local/bin/installer.sh
 
 RUN chown sandbox:sandbox /usr/local/bin/installer.sh /tmp/config.yml \
-  && chmod +x /usr/local/bin/installer.sh
-
-# Create /persist directory (mounted from host at runtime)
-RUN mkdir -p /persist && chown sandbox:sandbox /persist
+  && chmod +x /usr/local/bin/installer.sh \
+  && mkdir -p /persist && chown sandbox:sandbox /persist
 
 # Switch to non-root user for tool installation.
 USER sandbox
 ENV HOME=/home/sandbox
 WORKDIR /home/sandbox
 
-RUN mkdir -p /home/sandbox/.npm-global
-
-RUN installer.sh
+RUN mkdir -p /home/sandbox/.npm-global && installer.sh
 
 ENV PATH="/home/sandbox/.opencode/bin:/home/sandbox/node_modules/cline/bin:/home/sandbox/.npm-global/bin:/home/sandbox/.local/bin:/persist/.local/bin:/usr/local/bin:/usr/bin:/bin"
 

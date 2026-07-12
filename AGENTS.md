@@ -18,6 +18,7 @@
 | Package Manager | npm (for Cline), curl-based installers |
 | Markdown Lint | pymarkdownlnt |
 | Shell Script Lint | shellcheck |
+| Docker Lint | hadolint |
 | Git Hooks | prek |
 
 ## Project Structure
@@ -28,6 +29,8 @@ simple-agent-sandbox/
   │   └── workflows/
   │       └── ci.yml                (CI pipeline for linting and validation)
   ├── Dockerfile                    (Container build instructions)
+  ├── .dockerignore                 (Docker build context exclusions)
+  ├── .hadolint.yaml                (Hadolint configuration)
   ├── docker-compose.example.yml    (Template)
   ├── docker-compose.yml            (Real compose file — gitignored)
   ├── config.example.yml            (Template)
