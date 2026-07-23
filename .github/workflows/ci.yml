@@ -147,12 +147,29 @@ jobs:
 
       - name: Test command validation
         run: |
-          # Test that validation blocks malicious commands
-          if bash -c 'source scripts/installer.sh && validate_command "rm -rf / && echo hacked"'; then
-            echo "ERROR: Validation failed to block malicious command"
+          # Test that validate_command exists and rejects malicious commands
+          # First verify the function is available
+          bash -c 'source scripts/installer.sh && type validate_command'
+
+          # Capture output and exit code separately
+          output=$(bash -c 'source scripts/installer.sh && validate_command "rm -rf / && echo hacked"' 2>&1)
+          exit_code=$?
+
+          # Must fail (non-zero exit)
+          if [[ $exit_code -eq 0 ]]; then
+            echo "ERROR: validate_command unexpectedly succeeded for malicious input"
             exit 1
           fi
-          echo "Validation correctly blocked malicious command"
+
+          # Must have the expected error message
+          if [[ "$output" != *"ERROR: Command does not match safe patterns"* ]]; then
+            echo "ERROR: validate_command failed but with unexpected message"
+            echo "Expected: 'ERROR: Command does not match safe patterns'"
+            echo "Got: $output"
+            exit 1
+          fi
+
+          echo "Validation correctly blocked malicious command (exit=$exit_code)"
 
   docker-build:
     name: Build Docker image

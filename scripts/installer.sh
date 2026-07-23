@@ -43,6 +43,7 @@ validate_command() {
     '^curl -[fLsSf]+ https://[^[:space:]&|;<>$]+[[:space:]]*-o[[:space:]]+/tmp/[^[:space:]]+[[:space:]]*&&[[:space:]]*bash[[:space:]]+/tmp/[^[:space:]]+$'
     '^uv tool install [a-zA-Z0-9_-]+$'
     '^uv tool install [a-zA-Z0-9_-]+==[0-9.]+$'
+    # npm scoped packages (e.g., @scope/name) — @ is safe, not a shell metachar
     '^npm install( -[a-zA-Z]+)?( --[a-z-]+)?( [a-zA-Z0-9_@./+-]+)+$'
     '^pip install [a-zA-Z0-9_-]+$'
     '^pip install [a-zA-Z0-9_-]+==[0-9.]+$'
@@ -87,14 +88,14 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
 
     # Run the install command. A failed install of a single optional tool
     # must not abort the whole image build. If it fails, check whether the
-    # tool binary already exists on PATH — if so, skip with a warning.
+    # tool binary already exists on PATH â€” if so, skip with a warning.
     # Otherwise warn and continue so one flaky/optional tool cannot break the
     # entire sandbox image. Security validation above remains fatal.
     if ! eval "$cmd"; then
       if command -v "$key" &>/dev/null; then
-        echo "$key install reported failure but binary is present — skipping"
+        echo "$key install reported failure but binary is present â€” skipping"
       else
-        echo "WARNING: $key install failed and binary not found — continuing" >&2
+        echo "WARNING: $key install failed and binary not found â€” continuing" >&2
       fi
     fi
 

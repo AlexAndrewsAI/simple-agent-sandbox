@@ -6,10 +6,14 @@ cd "$(dirname "$0")/.." || exit
 # --- Prerequisite: config files ----------------------------------------------
 source scripts/_config_check.sh
 
-# Prompt for sandbox user password
-read -r -s -p "Enter password for sandbox user (default: sandbox): " SANDBOX_PASSWORD
-echo
-if [ -z "$SANDBOX_PASSWORD" ]; then
+# Resolve sandbox password: env var > interactive prompt > default
+if [ -z "${SANDBOX_PASSWORD:-}" ]; then
+  if [ -t 0 ]; then
+    read -r -s -p "Enter password for sandbox user (default: sandbox): " SANDBOX_PASSWORD
+    echo
+  fi
+fi
+if [ -z "${SANDBOX_PASSWORD:-}" ]; then
   SANDBOX_PASSWORD="sandbox"
 fi
 

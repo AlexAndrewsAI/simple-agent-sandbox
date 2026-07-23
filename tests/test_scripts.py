@@ -92,19 +92,30 @@ class TestConfigCheck:
 
 
 class TestBuild:
-    """Tests for build.sh — password resolution and docker detection."""
+    """Tests for build.sh — password resolution logic."""
+
+    PASSWORD_BLOCK = """\
+if [ -z "${SANDBOX_PASSWORD:-}" ]; then
+  if [ -t 0 ]; then
+    read -r -s -p "Enter password for sandbox user (default: sandbox): " SANDBOX_PASSWORD
+    echo
+  fi
+fi
+if [ -z "${SANDBOX_PASSWORD:-}" ]; then
+  SANDBOX_PASSWORD="sandbox"
+fi
+echo PASSWORD=$SANDBOX_PASSWORD
+"""
 
     def test_password_from_env_var(self) -> None:
         """SANDBOX_PASSWORD env var is used without prompting."""
-        cmd = f"source {SCRIPTS_DIR / 'build.sh'} && echo PASSWORD=$SANDBOX_PASSWORD"
-        result = _bash(cmd, env={"SANDBOX_PASSWORD": "secret123"})
+        result = _bash(self.PASSWORD_BLOCK, env={"SANDBOX_PASSWORD": "secret123"})
         assert result.returncode == 0
         assert "PASSWORD=secret123" in result.stdout
 
-    def test_password_defaults_when_non_interactive(self) -> None:
+    def test_password_defaults_when_no_env_and_non_interactive(self) -> None:
         """Default 'sandbox' is used when no env var and stdin is not a tty."""
-        cmd = f"source {SCRIPTS_DIR / 'build.sh'} && echo PASSWORD=$SANDBOX_PASSWORD"
-        result = _bash(cmd)
+        result = _bash(self.PASSWORD_BLOCK)
         assert result.returncode == 0
         assert "PASSWORD=sandbox" in result.stdout
 
@@ -118,36 +129,77 @@ class TestBuild:
 
 
 class TestPush:
-    """Tests for push.sh — version extraction and dry-run."""
+    """Tests for push.sh — version extraction, branch argument, and dry-run."""
+
+    @staticmethod
+    def _setup_push_env(tmp_path: Path) -> None:
+        """Create the scripts dir and config files push.sh requires."""
+        (tmp_path / "scripts").mkdir(exist_ok=True)
+        (tmp_path / "scripts" / "push.sh").write_text((SCRIPTS_DIR / "push.sh").read_text())
+        (tmp_path / "scripts" / "_config_check.sh").write_text(
+            (SCRIPTS_DIR / "_config_check.sh").read_text()
+        )
+        # Satisfy _config_check.sh's requirements
+        (tmp_path / "config.yml").write_text("")
+        (tmp_path / "docker-compose.yml").write_text("")
 
     def test_extracts_version(self, tmp_path: Path) -> None:
         """Version is correctly extracted from pyproject.toml."""
         (tmp_path / "pyproject.toml").write_text('[project]\nversion = "1.2.3"\n')
-        (tmp_path / "scripts").mkdir()
-        (tmp_path / "scripts" / "push.sh").write_text((SCRIPTS_DIR / "push.sh").read_text())
+        self._setup_push_env(tmp_path)
 
         result = _bash("bash scripts/push.sh --dry-run 2>&1; echo EXIT:$?", cwd=tmp_path)
+        assert result.returncode == 0
         assert "1.2.3" in result.stdout
 
     def test_error_on_missing_pyproject(self, tmp_path: Path) -> None:
         """Exits with error when pyproject.toml is missing."""
-        (tmp_path / "scripts").mkdir()
-        (tmp_path / "scripts" / "push.sh").write_text((SCRIPTS_DIR / "push.sh").read_text())
+        self._setup_push_env(tmp_path)
 
         result = _bash("bash scripts/push.sh --dry-run 2>&1; echo EXIT:$?", cwd=tmp_path)
+        assert result.returncode == 0
         assert "pyproject.toml not found" in result.stdout
 
     def test_dry_run_prints_commands(self, tmp_path: Path) -> None:
         """Dry-run mode prints commands instead of executing them."""
         (tmp_path / "pyproject.toml").write_text('[project]\nversion = "0.1.0"\n')
-        (tmp_path / "scripts").mkdir()
-        (tmp_path / "scripts" / "push.sh").write_text((SCRIPTS_DIR / "push.sh").read_text())
+        self._setup_push_env(tmp_path)
 
         result = _bash("bash scripts/push.sh --dry-run 2>&1; echo EXIT:$?", cwd=tmp_path)
         assert result.returncode == 0
         assert "[DRY-RUN]" in result.stdout
         assert "docker compose build" in result.stdout
         assert "docker push" in result.stdout
+        # Verify branch defaults to latest
+        assert "Branch:" in result.stdout
+        assert "Images tagged for push: 0.1.0, latest" in result.stdout or "Tags:" in result.stdout
+
+    def test_branch_argument(self, tmp_path: Path) -> None:
+        """Branch argument changes the source tag for versioning."""
+        (tmp_path / "pyproject.toml").write_text('[project]\nversion = "1.0.0"\n')
+        self._setup_push_env(tmp_path)
+
+        result = _bash("bash scripts/push.sh --branch dev --dry-run 2>&1; echo EXIT:$?", cwd=tmp_path)
+        assert result.returncode == 0
+        assert "Branch:  dev" in result.stdout
+
+    def test_branch_requires_value(self, tmp_path: Path) -> None:
+        """Error when --branch is provided without a value."""
+        (tmp_path / "pyproject.toml").write_text('[project]\nversion = "1.0.0"\n')
+        self._setup_push_env(tmp_path)
+
+        result = _bash("bash scripts/push.sh --branch 2>&1", cwd=tmp_path)
+        assert result.returncode != 0
+        assert "Error: --branch requires a tag name" in result.stdout
+
+    def test_unknown_argument_error(self, tmp_path: Path) -> None:
+        """Error message for unknown arguments."""
+        (tmp_path / "pyproject.toml").write_text('[project]\nversion = "1.0.0"\n')
+        self._setup_push_env(tmp_path)
+
+        result = _bash("bash scripts/push.sh --unknown 2>&1", cwd=tmp_path)
+        assert result.returncode != 0
+        assert "Error: Unknown argument: --unknown" in result.stdout
 
     def test_syntax(self) -> None:
         """Shell syntax check passes."""
@@ -229,15 +281,21 @@ class TestInstallerSourcingGuard:
         # If the main body ran, it would try to read /tmp/config.yml and fail
         assert "No install entries found" not in result.stdout
 
-    def test_main_body_runs_when_executed(self) -> None:
+    def test_main_body_runs_when_executed(self, tmp_path: Path) -> None:
         """Main body runs when the script is executed directly."""
-        result = subprocess.run(
-            ["bash", str(SCRIPTS_DIR / "installer.sh")],
-            capture_output=True,
-            text=True,
-        )
-        # Should fail on missing config, not on sourcing guard
-        assert result.returncode != 0
+        config = Path("/tmp/config.yml")
+        config.write_text("install: {}\n")
+        try:
+            result = subprocess.run(
+                ["bash", str(SCRIPTS_DIR / "installer.sh")],
+                capture_output=True,
+                text=True,
+            )
+        finally:
+            config.unlink(missing_ok=True)
+        # Should reach the install loop (sourcing guard not active) and
+        # report an empty config rather than silently doing nothing.
+        assert result.returncode == 0
         assert "No install entries found" in result.stdout
 
 

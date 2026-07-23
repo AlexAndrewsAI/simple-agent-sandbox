@@ -36,4 +36,5 @@ if [ -f /persist/bashrc-extra ]; then
     . /persist/bashrc-extra
 fi
 
-echo "Welcome to the Simple Agent Sandbox!"
+# Only print welcome in interactive shells
+[[ $- == *i* ]] && echo "Welcome to the Simple Agent Sandbox!"
