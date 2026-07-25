@@ -51,6 +51,11 @@ function Get-ContainerMountInfo {
         # Skip empty parts
         if (-not $hostPart -or -not $containerPart) { continue }
 
+        # Expand tilde to home directory
+        if ($hostPart.StartsWith('~')) {
+            $hostPart = $hostPart -replace '^~', $HOME
+        }
+
         # Resolve relative host paths
         if (-not [System.IO.Path]::IsPathRooted($hostPart)) {
             $hostAbs = Join-Path $ProjectRoot $hostPart

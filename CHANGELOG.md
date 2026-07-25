@@ -9,32 +9,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- pytest test framework with `test_installer.py` and `test_scripts.py` test suites
-- pip-audit for dependency vulnerability scanning
-- Build system configuration via hatchling
-- `.dockerignore`, `.editorconfig`, `.gitattributes`
-- `win-cd-mount.ps1` for Windows auto-cd into mounted volumes
-- Auto-cd into mounted subdirectories (Bash and PowerShell)
-- Mount CWD option for running sandbox in non-mounted directories
-- `GDU` and `lazygit` added to example installs
+- pytest framework with test suites for installer and scripts
+- pip-audit, hatchling build config, `.dockerignore`/`.editorconfig`/`.gitattributes`
+- Auto-cd into mounted subdirectories (Bash and PowerShell) with `win-cd-mount.ps1`
+- Mount CWD option for non-mounted directories; `GDU` and `lazygit` example installs
 - REVIEW.md code review report
 
 ### Changed
 
-- Updated CI pipeline with expanded test and lint steps
-- Improved `installer.sh` with better error handling and unicode cleanup
-- Improved `run.sh` with auto-cd mount support
-- Improved `win-run.ps1` with auto-cd mount support
-- Improved `win-build.ps1` with build arg passthrough
-- Improved `push.sh` with expanded push workflow
-- Updated `config.example.yml` with new options
-- Updated `docker-compose.example.yml` path
-- Updated Dockerfile
+- CI pipeline expanded with additional test and lint steps
+- `installer.sh` error handling and unicode cleanup improved
+- Run/build scripts (`.sh` / `.ps1`) enhanced with auto-cd, arg passthrough, and push workflow
+- `config.example.yml` and `docker-compose.example.yml` updated with new options/paths
 
 ### Fixed
 
 - Path fixes in `run.sh` and `win-run.ps1`
-- Build arg passthrough in `win-build.ps1`
 
 ## [0.1.1] - 2026-07-12 - #9 "add opencode functionality"
 

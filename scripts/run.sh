@@ -35,6 +35,9 @@ if [[ "$auto_cd_mount" != "false" || "$automount_cwd" != "false" ]]; then
             container_part="${vol##*:}"
             [[ -z "$host_part" || -z "$container_part" ]] && continue
 
+            # Expand tilde to home directory
+            host_part="${host_part/#\~/$HOME}"
+
             # Resolve relative host paths
             if [[ "$host_part" == /* ]]; then
                 host_abs="$host_part"
