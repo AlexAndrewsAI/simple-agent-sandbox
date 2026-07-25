@@ -1,4 +1,4 @@
-# _config_check.ps1 — Shared config-file prerequisite check
+# _config_check.ps1 - Shared config-file prerequisite check
 # Dot-source this from win-build.ps1 or win-run.ps1.
 # Derives the project root from its own location in scripts/.
 # Exits with code 1 if the user declines to copy missing example files.
@@ -21,11 +21,11 @@ if ($missingFiles.Count -gt 0) {
   Write-Host ""
 
   if (-not [Console]::IsInputRedirected) {
-    # Interactive terminal — prompt the user
+    # Interactive terminal - prompt the user
     $response = Read-Host "Copy from example files? [y/N]"
   } else {
-    # Non-interactive (CI, pipes, etc.) — auto-copy if possible
-    Write-Host "Non-interactive mode detected — auto-copying from example files."
+    # Non-interactive (CI, pipes, etc.) - auto-copy if possible
+        Write-Host "Non-interactive mode detected - auto-copying from example files."
     $response = "y"
   }
 

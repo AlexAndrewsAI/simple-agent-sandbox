@@ -23,6 +23,8 @@ temp.*
 /.*
 !.gitignore
 !.github
+!.gitattributes
+!.editorconfig
 !.env.example
 !.pre-commit-config.yaml
 !.pymarkdown.json

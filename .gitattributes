@@ -1,0 +1,11 @@
+# Shell scripts and Docker files must be LF (parsed by bash/Docker on Linux)
+*.sh      text eol=lf
+Dockerfile text eol=lf
+.bashrc    text eol=lf
+
+# PowerShell scripts are Windows-native
+*.ps1      text eol=crlf
+
+# YAML / config — keep as-is, Docker handles both
+*.yml      text
+*.yaml     text

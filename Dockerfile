@@ -59,6 +59,8 @@ WORKDIR /home/sandbox
 
 ENV PATH="/home/sandbox/.opencode/bin:/home/sandbox/node_modules/cline/bin:/home/sandbox/.npm-global/bin:/home/sandbox/.local/bin:/persist/.local/bin:/usr/local/bin:/usr/bin:/bin"
 
-RUN mkdir -p /home/sandbox/.npm-global && installer.sh
+RUN mkdir -p /home/sandbox/.npm-global && \
+    yq '.' /tmp/config.yml > /dev/null 2>&1 || { echo "ERROR: /tmp/config.yml is missing or invalid YAML"; exit 1; } && \
+    installer.sh
 
 CMD ["bash"]

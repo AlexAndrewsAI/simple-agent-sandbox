@@ -56,6 +56,9 @@ simple-agent-sandbox/
 - **Config-Driven:** All tool installation is driven by `config.yml`; do not hardcode installs in the Dockerfile
   - **Exception — `uv`:** The `uv` tool manager is installed via `pip` in the Dockerfile (line 35) because the installer itself depends on it to manage Python dev tools (pytest, ruff, mypy). Do not add a `uv` install entry in `config.yml`.
 - **Mounts in Compose:** Volume mounts are defined in `docker-compose.yml`, not parsed from config.yml by helper scripts
+- **Options:** `options:` in `config.yml` controls run script behavior:
+  - `auto_cd_mount` (default: `true`): Auto-cd to the matching path inside the container when CWD is within a mounted volume
+  - `automount_cwd` (default: `false`): When CWD is NOT within any mounted volume, mount it as `/cwd` for this run only. Also triggers auto-cd to `/cwd` if `auto_cd_mount` is enabled
 
 ### Docker Workflow
 
