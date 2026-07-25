@@ -18,4 +18,19 @@ apt:
   - vim
   - nano
   - less
+  - gdu
+  - lazygit
   - shellcheck
+
+# Options for the run script behavior
+options:
+  # Auto-cd to mounted subfolder when entering docker (default: enabled)
+  # When enabled, the run script detects if you're in a subfolder of a mounted
+  # volume and changes to the corresponding path inside the container.
+  auto_cd_mount: true
+
+  # Auto-mount current working directory (default: disabled)
+  # When enabled, if the current directory is NOT a subdirectory of any
+  # existing mounted volume, it is mounted as /cwd for this run only.
+  # Also triggers auto-cd to /cwd if auto_cd_mount is enabled.
+  automount_cwd: true

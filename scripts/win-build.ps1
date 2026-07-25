@@ -23,4 +23,4 @@ if (-not $env:SANDBOX_PASSWORD) {
     }
 }
 
-docker compose build --progress=plain --build-arg SANDBOX_PASSWORD="$env:SANDBOX_PASSWORD"
+docker compose build --progress=plain --build-arg SANDBOX_PASSWORD="$env:SANDBOX_PASSWORD" @args

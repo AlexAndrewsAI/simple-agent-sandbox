@@ -283,13 +283,26 @@ class TestInstallerSourcingGuard:
 
     def test_main_body_runs_when_executed(self, tmp_path: Path) -> None:
         """Main body runs when the script is executed directly."""
+        import os as _os
+
         config = Path("/tmp/config.yml")
         config.write_text("install: {}\n")
+
+        # Create a mock yq so the installer works in environments without yq
+        mock_bin = tmp_path / "bin"
+        mock_bin.mkdir()
+        mock_yq = mock_bin / "yq"
+        mock_yq.write_text("#!/bin/bash\necho '0'\n")
+        mock_yq.chmod(0o755)
+
+        env = {**_os.environ, "PATH": f"{mock_bin}:{_os.environ.get('PATH', '')}"}
+
         try:
             result = subprocess.run(
                 ["bash", str(SCRIPTS_DIR / "installer.sh")],
                 capture_output=True,
                 text=True,
+                env=env,
             )
         finally:
             config.unlink(missing_ok=True)

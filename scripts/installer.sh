@@ -65,8 +65,19 @@ validate_command() {
 # /tmp/config.yml or call exit.
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
 
+  # Ensure yq is available (installed by Dockerfile)
+  if ! command -v yq &>/dev/null; then
+    echo "ERROR: yq not found — cannot parse config.yml for tool installation." >&2
+    echo "yq should be installed during Docker image build. Rebuild with: docker compose build" >&2
+    exit 1
+  fi
+
   # Count of install entries
-  count=$(yq -r '.install | length' /tmp/config.yml)
+  count=$(yq -r '.install | length' /tmp/config.yml 2>/dev/null)
+  if [ -z "$count" ] || ! [[ "$count" =~ ^[0-9]+$ ]]; then
+    echo "ERROR: Failed to parse /tmp/config.yml — check that the file contains valid YAML." >&2
+    exit 1
+  fi
 
   if [ "$count" -eq 0 ]; then
     echo "No install entries found in config.yml"
@@ -88,14 +99,14 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
 
     # Run the install command. A failed install of a single optional tool
     # must not abort the whole image build. If it fails, check whether the
-    # tool binary already exists on PATH â€” if so, skip with a warning.
+    # tool binary already exists on PATH: if so, skip with a warning.
     # Otherwise warn and continue so one flaky/optional tool cannot break the
     # entire sandbox image. Security validation above remains fatal.
     if ! eval "$cmd"; then
       if command -v "$key" &>/dev/null; then
-        echo "$key install reported failure but binary is present â€” skipping"
+        echo "$key install reported failure but binary is present: skipping"
       else
-        echo "WARNING: $key install failed and binary not found â€” continuing" >&2
+        echo "WARNING: $key install failed and binary not found: continuing" >&2
       fi
     fi
 
