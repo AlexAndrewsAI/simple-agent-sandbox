@@ -151,9 +151,12 @@ jobs:
           # First verify the function is available
           bash -c 'source scripts/installer.sh && type validate_command'
 
-          # Capture output and exit code separately
-          output=$(bash -c 'source scripts/installer.sh && validate_command "rm -rf / && echo hacked"' 2>&1)
-          exit_code=$?
+          # Capture output and exit code separately.
+          # NOTE: validate_command is expected to return non-zero (malicious command).
+          # Under set -e (GitHub Actions default), command substitution with non-zero
+          # exit would cause the shell to exit immediately, so we use || to catch it.
+          exit_code=0
+          output=$(bash -c 'source scripts/installer.sh && validate_command "rm -rf / && echo hacked"' 2>&1) || exit_code=$?
 
           # Must fail (non-zero exit)
           if [[ $exit_code -eq 0 ]]; then
