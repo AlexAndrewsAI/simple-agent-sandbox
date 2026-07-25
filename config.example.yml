@@ -15,12 +15,13 @@ install:
 
 # apt packages installed during docker build
 apt:
-  - vim
-  - nano
-  - less
-  - gdu
-  - lazygit
-  - shellcheck
+  - vim         # text editor
+  - nano        # text editor
+  - less        # text file paging
+  - gdu         # terminal UI disk usage
+  - lazygit     # terminal UI for git
+  - shellcheck  # shell linting
+  - prek        # python precommit package
 
 # Options for the run script behavior
 options:
