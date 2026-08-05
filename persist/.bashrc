@@ -55,11 +55,3 @@ fi
 
 # opencode
 export PATH=/persist/.opencode/bin:$PATH
-
-
-# Start Ollama server automatically if installed and not already running
-if command -v ollama >/dev/null 2>&1; then
-    if ! pgrep -x ollama >/dev/null 2>&1; then
-      (ollama serve >/dev/null 2>&1 &)
-    fi
-fi
