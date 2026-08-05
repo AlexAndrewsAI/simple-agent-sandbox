@@ -5,7 +5,8 @@ function Get-ContainerMountInfo {
     param(
         [string]$ProjectRoot,
         [string]$ConfigPath,
-        [string]$ComposePath
+        [string]$ComposePath,
+        [switch]$ForceAutomount
     )
 
     # Check if yq is available
@@ -18,6 +19,10 @@ function Get-ContainerMountInfo {
     # Parse options from config.yml (defaults: auto_cd_mount=true, automount_cwd=false)
     $autoCdMount = (& yq -r '.options.auto_cd_mount // true' $ConfigPath 2>$null)
     $automountCwd = (& yq -r '.options.automount_cwd // false' $ConfigPath 2>$null)
+
+    if ($ForceAutomount) {
+        $automountCwd = "true"
+    }
 
     if ($autoCdMount -eq "false" -and $automountCwd -eq "false") {
         return @{ ContainerCwd = $null; AutomountVolume = $null }
@@ -98,10 +103,11 @@ function Get-ContainerMountInfo {
 param(
     [string]$ProjectRoot,
     [string]$ConfigPath,
-    [string]$ComposePath
+    [string]$ComposePath,
+    [switch]$ForceAutomount
 )
 
-$mountInfo = Get-ContainerMountInfo -ProjectRoot $ProjectRoot -ConfigPath $ConfigPath -ComposePath $ComposePath
+$mountInfo = Get-ContainerMountInfo -ProjectRoot $ProjectRoot -ConfigPath $ConfigPath -ComposePath $ComposePath -ForceAutomount:$ForceAutomount
 # Output as structured data: first line = container cwd, second line = automount volume
 if ($mountInfo.ContainerCwd) {
     Write-Output $mountInfo.ContainerCwd

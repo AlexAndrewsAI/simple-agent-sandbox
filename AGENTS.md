@@ -59,6 +59,7 @@ simple-agent-sandbox/
 - **Options:** `options:` in `config.yml` controls run script behavior:
   - `auto_cd_mount` (default: `true`): Auto-cd to the matching path inside the container when CWD is within a mounted volume
   - `automount_cwd` (default: `false`): When CWD is NOT within any mounted volume, mount it as `/cwd` for this run only. Also triggers auto-cd to `/cwd` if `auto_cd_mount` is enabled
+  - `no_internet` (default: `false`): Disable internet access at runtime by merging a temporary compose override setting `network_mode: none` (build unaffected). Overridden by the `-n|--no-internet` CLI flag on `run.sh` / `win-run.ps1`
 
 ### Docker Workflow
 
