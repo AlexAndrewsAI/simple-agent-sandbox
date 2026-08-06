@@ -11,6 +11,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+import yaml
+
 SCRIPTS = Path(__file__).resolve().parent.parent / "scripts"
 INSTALLER = SCRIPTS / "installer.sh"
 
@@ -39,6 +41,17 @@ class TestCurlPipeSh:
 
     def test_shuffled_flags(self) -> None:
         assert _validate("curl -fLsS https://example.com/install.sh | bash")
+
+    def test_github_raw_https_pipe_sh(self) -> None:
+        # Mirrors the "fresh" install command — GitHub raw URL piped to sh
+        assert _validate(
+            "curl -fsSL https://raw.githubusercontent.com/sinelaw/fresh"
+            "/refs/heads/master/scripts/install.sh | sh"
+        )
+
+    def test_https_pipe_sh_with_trailing_fragment(self) -> None:
+        # Mirrors the "ollama" install command
+        assert _validate("curl -fsSL https://ollama.com/install.sh | sh")
 
 
 class TestCurlDownloadRun:
@@ -138,6 +151,14 @@ class TestMalformedCurl:
             "curl -fsSL https://example.com/install.sh"
         )
 
+    def test_curl_without_flags_rejected(self) -> None:
+        # curl without any flags (e.g. "fresh" install before the fix)
+        # must be rejected — the safe pattern requires -[flags]
+        assert not _validate(
+            "curl https://raw.githubusercontent.com/sinelaw/fresh"
+            "/refs/heads/master/scripts/install.sh | sh"
+        )
+
 
 class TestMalformedUv:
     def test_no_package(self) -> None:
@@ -164,3 +185,33 @@ class TestMalformedPip:
 
     def test_appended_command(self) -> None:
         assert not _validate("pip install requests && rm -rf /")
+
+
+class TestConfigExampleCommands:
+    """Regression test: every install command in config.example.yml
+    must pass validate_command().
+
+    This catches config drift early — e.g. the 'fresh' command previously
+    used bare 'curl' (no -fsSL flags) which failed validation at Docker
+    build time.
+    """
+
+
+    ROOT = Path(__file__).resolve().parent.parent
+    CONFIG = ROOT / "config.example.yml"
+
+    def test_all_config_commands_pass_validation(self) -> None:
+        assert self.CONFIG.exists(), f"{self.CONFIG} not found"
+        data = yaml.safe_load(self.CONFIG.read_text())
+        install = data.get("install", {})
+        assert install, "no install entries in config.example.yml"
+
+        failures: list[str] = []
+        for key, cmd in install.items():
+            if not _validate(cmd):
+                failures.append(f"  {key}: {cmd}")
+
+        assert not failures, (
+            "The following config commands failed validation:\n"
+            + "\n".join(failures)
+        )

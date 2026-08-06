@@ -1,11 +1,19 @@
 # win-cd-mount.ps1 - Auto-cd to mounted subfolder and automount_cwd logic
 
+param(
+    [string]$ProjectRoot,
+    [string]$ConfigPath,
+    [string]$ComposePath,
+    [switch]$ForceAutomount
+)
+
 # Returns an object with ContainerCwd and AutomountVolume properties
 function Get-ContainerMountInfo {
     param(
         [string]$ProjectRoot,
         [string]$ConfigPath,
-        [string]$ComposePath
+        [string]$ComposePath,
+        [switch]$ForceAutomount
     )
 
     # Check if yq is available
@@ -18,6 +26,15 @@ function Get-ContainerMountInfo {
     # Parse options from config.yml (defaults: auto_cd_mount=true, automount_cwd=false)
     $autoCdMount = (& yq -r '.options.auto_cd_mount // true' $ConfigPath 2>$null)
     $automountCwd = (& yq -r '.options.automount_cwd // false' $ConfigPath 2>$null)
+
+    # yq failures (missing/unreadable config) fall back to the same defaults
+    # run.sh uses: auto_cd_mount=true, automount_cwd=false
+    if ([string]::IsNullOrEmpty($autoCdMount)) { $autoCdMount = "true" }
+    if ([string]::IsNullOrEmpty($automountCwd)) { $automountCwd = "false" }
+
+    if ($ForceAutomount) {
+        $automountCwd = "true"
+    }
 
     if ($autoCdMount -eq "false" -and $automountCwd -eq "false") {
         return @{ ContainerCwd = $null; AutomountVolume = $null }
@@ -37,7 +54,7 @@ function Get-ContainerMountInfo {
     $cwd = (Get-Location).Path
     $cwdInMount = $false
 
-    foreach ($vol in $volumes.ToString().Split("`n")) {
+    foreach ($vol in @($volumes)) {
         $vol = $vol.Trim()
         if (-not $vol -or -not $vol.Contains(":")) {
             continue
@@ -95,13 +112,7 @@ function Get-ContainerMountInfo {
 }
 
 # --- Entry point --------------------------------------------------------------
-param(
-    [string]$ProjectRoot,
-    [string]$ConfigPath,
-    [string]$ComposePath
-)
-
-$mountInfo = Get-ContainerMountInfo -ProjectRoot $ProjectRoot -ConfigPath $ConfigPath -ComposePath $ComposePath
+$mountInfo = Get-ContainerMountInfo -ProjectRoot $ProjectRoot -ConfigPath $ConfigPath -ComposePath $ComposePath -ForceAutomount:$ForceAutomount
 # Output as structured data: first line = container cwd, second line = automount volume
 if ($mountInfo.ContainerCwd) {
     Write-Output $mountInfo.ContainerCwd

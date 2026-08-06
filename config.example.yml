@@ -1,5 +1,5 @@
 # Install list — each key maps to its install command
-# Note: uv is already installed system-wide via pip in the Dockerfile (line 35),
+# Note: uv is already installed system-wide via pip in the Dockerfile (line 47),
 # so it does not need an install entry here. Entries below use uv to manage
 # Python dev tools.
 install:
@@ -10,8 +10,13 @@ install:
   # AI agents with strong free plans
   hermes: "curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh  -o /tmp/hermes_install.sh && bash /tmp/hermes_install.sh && rm -f /tmp/hermes_install.sh"
   devin: "curl -fsSL https://cli.devin.ai/install.sh -o /tmp/devin_install.sh && bash /tmp/devin_install.sh && rm -f /tmp/devin_install.sh"
-  cline: "npm install cline"
+  cline: "npm install -g cline"
   opencode: "curl -fsSL https://opencode.ai/install | bash"
+  ollama: "curl -fsSL https://ollama.com/install.sh | bash"
+
+  # Terminal-based IDE
+  fresh: "curl -fsSL https://raw.githubusercontent.com/sinelaw/fresh/refs/heads/master/scripts/install.sh | bash"
+
 
 # apt packages installed during docker build
 apt:
@@ -33,4 +38,11 @@ options:
   # When enabled, if the current directory is NOT a subdirectory of any
   # existing mounted volume, it is mounted as /cwd for this run only.
   # Also triggers auto-cd to /cwd if auto_cd_mount is enabled.
-  automount_cwd: true
+  automount_cwd: false
+
+  # Disable internet access at runtime (default: disabled)
+  # When enabled, a temporary compose override is merged at runtime setting
+  # network_mode: none, blocking all network access for the session.
+  # Runtime only — does not affect the build. Overridable per-run with the
+  # -n/--no-internet flag.
+  no_internet: false

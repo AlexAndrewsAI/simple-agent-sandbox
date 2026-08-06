@@ -6,10 +6,10 @@
 $checkRoot = Split-Path -Parent $PSScriptRoot
 
 $missingFiles = @()
-if (-not (Test-Path "$checkRoot\config.yml")) {
+if (-not (Test-Path (Join-Path $checkRoot "config.yml"))) {
   $missingFiles += "config.yml"
 }
-if (-not (Test-Path "$checkRoot\docker-compose.yml")) {
+if (-not (Test-Path (Join-Path $checkRoot "docker-compose.yml"))) {
   $missingFiles += "docker-compose.yml"
 }
 
@@ -32,8 +32,8 @@ if ($missingFiles.Count -gt 0) {
   if ($response -eq 'y' -or $response -eq 'Y') {
     foreach ($file in $missingFiles) {
       $example = $file -replace '\.yml$', '.example.yml'
-      if (Test-Path "$checkRoot\$example") {
-        Copy-Item "$checkRoot\$example" "$checkRoot\$file"
+      if (Test-Path (Join-Path $checkRoot $example)) {
+        Copy-Item (Join-Path $checkRoot $example) (Join-Path $checkRoot $file)
         Write-Host "Copied $example to $file" -ForegroundColor Green
       } else {
         Write-Host "ERROR: $example not found" -ForegroundColor Red
