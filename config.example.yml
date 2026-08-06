@@ -1,5 +1,5 @@
 # Install list — each key maps to its install command
-# Note: uv is already installed system-wide via pip in the Dockerfile (line 35),
+# Note: uv is already installed system-wide via pip in the Dockerfile (line 47),
 # so it does not need an install entry here. Entries below use uv to manage
 # Python dev tools.
 install:

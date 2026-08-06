@@ -23,10 +23,14 @@ A Docker-based sandbox environment for running AI agents. Mounts `./persist` dir
 | Base Image        | python:3-trixie                        |
 | Config Format     | YAML (read via yq)                     |
 | Shell             | Bash                                   |
-| Package Manager   | npm (for Cline), curl-based installers |
-| Markdown Lint     | pymarkdownlnt                          |
-| Shell Script Lint | shellcheck                             |
-| Git Hooks         | prek                                   |
+| Package Manager   | pip (uv), npm (Cline), curl-based installers |
+| AI Agents         | hermes, devin, cline, opencode               |
+| Local LLM Runtime | ollama                                       |
+| Terminal IDE      | fresh                                        |
+| Markdown Lint     | pymarkdownlnt                                |
+| Shell Script Lint | shellcheck                                   |
+| Docker Lint       | hadolint                                     |
+| Git Hooks         | prek                                         |
 
 ## Project Structure
 

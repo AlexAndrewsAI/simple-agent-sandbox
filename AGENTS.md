@@ -16,6 +16,9 @@
 | Config Format | YAML (read via yq) |
 | Shell | Bash |
 | Package Manager | pip (uv), npm (Cline), curl-based installers |
+| AI Agents | hermes, devin, cline, opencode |
+| Local LLM Runtime | ollama |
+| Terminal IDE | fresh |
 | Markdown Lint | pymarkdownlnt |
 | Shell Script Lint | shellcheck |
 | Docker Lint | hadolint |
@@ -54,7 +57,7 @@ simple-agent-sandbox/
 - **Apt Packages:** Edit `config.yml` — add/remove packages under `apt:` (installed during Docker build as root)
 - **Install Format:** Each key under `install:` maps to a shell command string executed by `scripts/installer.sh`
 - **Config-Driven:** All tool installation is driven by `config.yml`; do not hardcode installs in the Dockerfile
-  - **Exception — `uv`:** The `uv` tool manager is installed via `pip` in the Dockerfile (line 35) because the installer itself depends on it to manage Python dev tools (pytest, ruff, mypy). Do not add a `uv` install entry in `config.yml`.
+  - **Exception — `uv`:** The `uv` tool manager is installed via `pip` in the Dockerfile (line 47) because the installer itself depends on it to manage Python dev tools (pytest, ruff, mypy). Do not add a `uv` install entry in `config.yml`.
 - **Mounts in Compose:** Volume mounts are defined in `docker-compose.yml`, not parsed from config.yml by helper scripts
 - **Options:** `options:` in `config.yml` controls run script behavior:
   - `auto_cd_mount` (default: `true`): Auto-cd to the matching path inside the container when CWD is within a mounted volume
