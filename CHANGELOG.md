@@ -5,25 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.2.1] - 2026-07-12 - "test coverage for Dockerfile, PowerShell scripts, and no-internet runtime"
+## [0.3.0] - 2026-08-05
 
 ### Added
 
-- `tests/test_dockerfile.py`: hadolint compliance for the Dockerfile (mirrors the pre-commit hook)
-- `tests/test_windows_scripts.py`: static structure checks plus functional tests for `win-run.ps1`, `win-build.ps1`, `win-cd-mount.ps1`, and `_config_check.ps1` (run under `pwsh`, skipped when unavailable)
-- `tests/test_no_internet.py`: no-internet runtime tests driving `run.sh` and `win-run.ps1` against a mock `docker`, including compose-override merge semantics
-- Mock-`docker` invocation tests for auto-cd/automount in `run.sh` (`tests/test_scripts.py`)
-- CI: installs `yq` and `hadolint` in the test job so the new tests run in CI
+- `ollama` local LLM runtime and `fresh` terminal IDE
+- No-internet runtime mode via `options.no_internet` in `config.yml` or the `-n/--no-internet` flag on `run.sh`/`win-run.ps1`
+- `-a/--automount-cwd` CLI flag to force mounting the current directory as `/cwd`
+- Resume aliases (`cline-resume`, `hermes-resume`, `devin-resume`, `opencode-resume`) in the sandbox shell
+- `zstd` in the base image packages
 
 ### Fixed
 
-- `win-cd-mount.ps1`: `param()` was not the first statement, so arguments were silently ignored (auto-cd/automount never bound)
-- `win-cd-mount.ps1`: multi-volume compose parsing broke (`.ToString()` on the volume array returned `System.Object[]`)
-- `win-cd-mount.ps1`: missing/unreadable config now defaults `automount_cwd` to `false`, matching `run.sh`
-- `win-run.ps1`: `-n/--no-internet` flag was a no-op due to case-insensitive `$noInternet`/`$NoInternet` variable shadowing
-- PowerShell scripts: use `Join-Path` for path construction so they work on both Windows and Linux `pwsh`
+- `win-run.ps1`: `-n/--no-internet` flag was a no-op due to variable shadowing
+- `win-cd-mount.ps1`: auto-cd/automount arguments were silently ignored, and multi-volume compose parsing broke
+- PowerShell scripts: `Join-Path` used for paths so they work on Windows and Linux `pwsh`
+
+### Changed
+
+- Tools are now installed as root during the build so sudo-requiring installers (like `ollama`) work
+- `config.example.yml`: `cline` installed globally, `automount_cwd` defaults to `false`, new `no_internet` option
+- Docker build arg renamed to `SANDBOX_PW` (legacy `SANDBOX_PASSWORD` still accepted)
+- `pyproject.toml` version bumped to `0.3.0`
 
 ## [0.2.0] - 2026-07-12 - #10 "initial run in cwd, and add pytest"
+
+> Note: pyproject.toml was intended to be bumped to 0.2.0 with this release, but the version field was mistakenly left at 0.1.1.
 
 ### Added
 
@@ -82,6 +89,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Basic functionality with Hermes agent only
 - Dockerfile based on `python:3-trixie`
 
+[0.3.0]: https://github.com/AlexAndrewsAI/simple-agent-sandbox/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/AlexAndrewsAI/simple-agent-sandbox/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/AlexAndrewsAI/simple-agent-sandbox/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/AlexAndrewsAI/simple-agent-sandbox/releases/tag/v0.1.0
