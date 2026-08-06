@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2026-08-06 - "test coverage for Dockerfile, PowerShell scripts, and no-internet runtime"
+
+### Added
+
+- `tests/test_dockerfile.py`: hadolint compliance for the Dockerfile (mirrors the pre-commit hook)
+- `tests/test_windows_scripts.py`: static structure checks plus functional tests for `win-run.ps1`, `win-build.ps1`, `win-cd-mount.ps1`, and `_config_check.ps1` (run under `pwsh`, skipped when unavailable)
+- `tests/test_no_internet.py`: no-internet runtime tests driving `run.sh` and `win-run.ps1` against a mock `docker`, including compose-override merge semantics
+- Mock-`docker` invocation tests for auto-cd/automount in `run.sh` (`tests/test_scripts.py`)
+- CI: installs `yq` and `hadolint` in the test job so the new tests run in CI
+
+### Fixed
+
+- `win-cd-mount.ps1`: `param()` was not the first statement, so arguments were silently ignored (auto-cd/automount never bound)
+- `win-cd-mount.ps1`: multi-volume compose parsing broke (`.ToString()` on the volume array returned `System.Object[]`)
+- `win-cd-mount.ps1`: missing/unreadable config now defaults `automount_cwd` to `false`, matching `run.sh`
+- `win-run.ps1`: `-n/--no-internet` flag was a no-op due to case-insensitive `$noInternet`/`$NoInternet` variable shadowing
+- PowerShell scripts: use `Join-Path` for path construction so they work on both Windows and Linux `pwsh`
+
 ## [0.2.0] - 2026-07-12 - #10 "initial run in cwd, and add pytest"
 
 ### Added

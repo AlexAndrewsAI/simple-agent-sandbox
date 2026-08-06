@@ -8,10 +8,10 @@ param(
 )
 
 # --- Prerequisite: config files ----------------------------------------------
-. "$PSScriptRoot\_config_check.ps1"
+. (Join-Path $PSScriptRoot "_config_check.ps1")
 
 # --- Auto-cd to mounted subfolder / automount_cwd ----------------------------
-$mountOutput = & "$PSScriptRoot\win-cd-mount.ps1" -ProjectRoot $checkRoot -ConfigPath "$checkRoot\config.yml" -ComposePath "$checkRoot\docker-compose.yml" -ForceAutomount:$AutomountCwd.IsPresent
+$mountOutput = & (Join-Path $PSScriptRoot "win-cd-mount.ps1") -ProjectRoot $checkRoot -ConfigPath (Join-Path $checkRoot "config.yml") -ComposePath (Join-Path $checkRoot "docker-compose.yml") -ForceAutomount:$AutomountCwd.IsPresent
 $mountLines = $mountOutput | Where-Object { $_ -ne $null -and $_ -ne "" }
 
 $containerCwd = $null
@@ -25,17 +25,17 @@ if ($mountLines -is [array]) {
 }
 
 # --- Resolve no-internet: CLI flag takes precedence over config -----------------
-$noInternet = $false
+$noInternetEnabled = $false
 $yq = Get-Command yq -ErrorAction SilentlyContinue
 if ($yq) {
-    $cfgNoInternet = (& yq -r '.options.no_internet // false' "$checkRoot\config.yml" 2>$null)
-    if ($cfgNoInternet -eq "true") { $noInternet = $true }
+    $cfgNoInternet = (& yq -r '.options.no_internet // false' (Join-Path $checkRoot "config.yml") 2>$null)
+    if ($cfgNoInternet -eq "true") { $noInternetEnabled = $true }
 }
-if ($NoInternet.IsPresent) { $noInternet = $true }
+if ($NoInternet.IsPresent) { $noInternetEnabled = $true }
 
-$composeArgs = @("-f", "$checkRoot\docker-compose.yml")
+$composeArgs = @("-f", (Join-Path $checkRoot "docker-compose.yml"))
 $noNetworkOverride = $null
-if ($noInternet) {
+if ($noInternetEnabled) {
     $noNetworkOverride = Join-Path ([System.IO.Path]::GetTempPath()) ("no-internet-" + [guid]::NewGuid().ToString("N") + ".yml")
     @'
 services:

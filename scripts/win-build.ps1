@@ -1,7 +1,7 @@
 # build.ps1 - Build the Docker image (and optionally push to Docker Hub)
 
 # --- Prerequisite: config files ----------------------------------------------
-. "$PSScriptRoot\_config_check.ps1"
+. (Join-Path $PSScriptRoot "_config_check.ps1")
 
 # Resolve sandbox password: env var > interactive prompt > default
 if (-not $env:SANDBOX_PASSWORD) {

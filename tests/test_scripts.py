@@ -265,6 +265,75 @@ class TestRun:
         assert result.returncode == 0
 
 
+class TestRunShInvocation:
+    """run.sh forwards auto-cd/automount results to docker (mock docker)."""
+
+    COMPOSE = """\
+services:
+  sandbox:
+    image: test
+    volumes:
+      - ./persist:/persist
+"""
+
+    CONFIG = """\
+options:
+  auto_cd_mount: {auto_cd}
+  automount_cwd: {automount}
+  no_internet: false
+"""
+
+    @staticmethod
+    def _invoke(
+        tmp_path: Path,
+        mock_docker: Path,
+        *,
+        auto_cd: bool,
+        automount: bool,
+        cwd: Path,
+    ) -> None:
+        from conftest import docker_args, make_project, mock_env
+
+        project = make_project(
+            tmp_path,
+            ["run.sh", "_config_check.sh"],
+            TestRunShInvocation.CONFIG.format(
+                auto_cd="true" if auto_cd else "false",
+                automount="true" if automount else "false",
+            ),
+            TestRunShInvocation.COMPOSE,
+        )
+        script = project / "scripts" / "run.sh"
+        result = _bash(f"bash {script}", cwd=cwd, env=mock_env(mock_docker))
+        assert result.returncode == 0, result.stderr
+        return docker_args(mock_docker)
+
+    def test_automount_passes_volume_and_cwd(
+        self, tmp_path: Path, mock_docker: Path
+    ) -> None:
+        work = tmp_path / "work"
+        work.mkdir()
+        args = self._invoke(
+            tmp_path, mock_docker, auto_cd=False, automount=True, cwd=work
+        )
+        assert "compose" in args and "run" in args
+        assert "-v" in args
+        vol = args[args.index("-v") + 1]
+        assert vol.endswith(f"{work}:/cwd")
+        assert "cd '/cwd' && exec bash" in " ".join(args)
+
+    def test_container_cwd_inside_mount(
+        self, tmp_path: Path, mock_docker: Path
+    ) -> None:
+        sub = tmp_path / "persist" / "sub"
+        sub.mkdir(parents=True)
+        args = self._invoke(
+            tmp_path, mock_docker, auto_cd=True, automount=False, cwd=sub
+        )
+        assert "cd '/persist/sub' && exec bash" in " ".join(args)
+        assert "-v" not in args
+
+
 # ── installer.sh (sourcing guard) ────────────────────────────────────
 
 

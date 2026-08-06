@@ -57,6 +57,16 @@ jobs:
       - name: Install dependencies
         run: uv sync --dev
 
+      - name: Install yq
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y yq
+
+      - name: Install hadolint
+        run: |
+          sudo curl -fsSL https://github.com/hadolint/hadolint/releases/download/v2.12.0/hadolint-Linux-x86_64 -o /usr/local/bin/hadolint
+          sudo chmod +x /usr/local/bin/hadolint
+
       - name: Run tests
         run: uv run pytest
 
