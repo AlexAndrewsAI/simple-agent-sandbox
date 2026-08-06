@@ -71,9 +71,9 @@ RUN chown sandbox:sandbox /usr/local/bin/installer.sh /tmp/config.yml \
 RUN mkdir -p /home/sandbox/.npm-global \
     && (HOME=/home/sandbox yq '.' /tmp/config.yml > /dev/null 2>&1 \
         || { echo "ERROR: /tmp/config.yml is missing or invalid YAML"; exit 1; }) \
-    && HOME=/home/sandbox installer.sh; \
-    chown -R sandbox:sandbox /home/sandbox/.npm-global /home/sandbox/.local /home/sandbox/.opencode /home/sandbox/node_modules 2>/dev/null; \
-    true
+    && HOME=/home/sandbox installer.sh \
+    && mkdir -p /home/sandbox/.local /home/sandbox/.opencode /home/sandbox/node_modules \
+    && chown -R sandbox:sandbox /home/sandbox/.npm-global /home/sandbox/.local /home/sandbox/.opencode /home/sandbox/node_modules
 
 # Switch to non-root user for runtime. Use numeric UID so the image
 # is portable to environments (e.g. Kubernetes with runAsNonRoot) that
