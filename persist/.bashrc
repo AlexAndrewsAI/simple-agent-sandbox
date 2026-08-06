@@ -31,7 +31,7 @@ alias venv-here="[ ! -d .venv ] && uv venv; source .venv/bin/activate"
 
 # Resume previous session for installed AI agents
 if command -v cline >/dev/null 2>&1; then
-    alias cline-resume='_sid=$(cline history --json --limit 1 2>/dev/null | python3 -c "import sys,json;d=json.load(sys.stdin);print(d[0][\"sessionId\"] if d else \"\")" 2>/dev/null); if [ -n "$_sid" ]; then cline --id "$_sid"; else echo "No previous cline session found"; fi'
+    alias cline-resume='cline history'
 fi
 if command -v hermes >/dev/null 2>&1; then
     alias hermes-resume='hermes --continue'
