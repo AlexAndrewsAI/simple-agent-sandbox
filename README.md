@@ -6,10 +6,10 @@ A Docker-based sandbox environment for running AI agents. Mounts `./persist` dir
 
 1. **Copy Configs:** Copy the example files (build/run scripts will prompt if missing):
 
-    ```bash
-    cp config.example.yml config.yml
-    cp docker-compose.example.yml docker-compose.yml
-    ```
+   ```bash
+   cp config.example.yml config.yml
+   cp docker-compose.example.yml docker-compose.yml
+   ```
 
 2. **Edit:** Uncomment/adjust mounts in `docker-compose.yml` and tools in `config.yml`
 3. **Build:** `docker compose build`
@@ -17,12 +17,12 @@ A Docker-based sandbox environment for running AI agents. Mounts `./persist` dir
 
 ## Tech Stack
 
-| Component         | Tool                                   |
-| ----------------- | -------------------------------------- |
-| Container Runtime | Docker & Docker Compose                |
-| Base Image        | python:3-trixie                        |
-| Config Format     | YAML (read via yq)                     |
-| Shell             | Bash                                   |
+| Component         | Tool                                         |
+| ------------------- | ------------------------------------------ |
+| Container Runtime | Docker & Docker Compose                      |
+| Base Image        | python:3-trixie                              |
+| Config Format     | YAML (read via yq)                           |
+| Shell             | Bash                                         |
 | Package Manager   | pip (uv), npm (Cline), curl-based installers |
 | AI Agents         | hermes, devin, cline, opencode               |
 | Local LLM Runtime | ollama                                       |
@@ -91,14 +91,14 @@ docker compose up -d && docker compose exec sandbox bash  # Persistent session
 
 ## Agents
 
-All CLIs listed below offer usable **free** plans.
+All CLIs listed below offer **usable free plans**. You can also connect free APIs with [OpenRouter](https://openrouter.ai), [Ollama Cloud](https://ollama.com/pricing), or [Nvidia](https://build.nvidia.com).
 
-| Agent                                                  | Description                                                                                        | Notes          | Recommendation 2026-07-12 |
-| ------------------------------------------------------ | -------------------------------------------------------------------------------------------------- | -------------- | ------------------------- |
-| [Hermes Agent](https://hermes-agent.nousresearch.com/) | Free models via API with [OpenRouter](https://openrouter.ai) or [Nvidia](https://build.nvidia.com) | Heavy Install  | openrouter/hy3            |
-| [Cline CLI](https://cline.bot/)                            | Offers a free plan with decent LLM models                                                          | Medium install | deepseek-v4-flash         |
-| [Devin CLI](https://cli.devin.ai/)                     | Offers free plan with decent LLM model                                                             | Light install  | swe-1.6                   |
-| [OpenCode CLI](https://opencode.ai)                        | Offers decent free models via OpenCode Zen                                                         | Light install  | big-pickle                |
+| Agent                                                  | Description                                                                               | Notes          | Recommendation 2026-08-06 |
+| -------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ---------------- | --------------------------- |
+| [Hermes Agent](https://hermes-agent.nousresearch.com/) | Free models with [Nous Portal](https://portal.nousresearch.com/) *payment method required* | Heavy Install  | ling-3.0-flash            |
+| [Cline CLI](https://cline.bot/)                        | Offers a free plan with decent LLM models                                                 | Medium install | deepseek-v4-flash         |
+| [Devin CLI](https://cli.devin.ai/)                     | Offers free plan with decent LLM model                                                    | Light install  | swe-1.6                   |
+| [OpenCode CLI](https://opencode.ai)                    | Offers decent free models via OpenCode Zen                                                | Light install  | big-pickle                |
 
 ## Data Persistence
 
@@ -147,7 +147,7 @@ IMAGE=alexandrewsai/simple-agent-sandbox:latest docker compose run --rm sandbox
 ## Environment Variables
 
 | Variable   | Value                                                                                                                                        | Description                                                     |
-| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
 | `HOME`     | `/persist`                                                                                                                                   | Sets the home directory inside the container                    |
 | `PATH`     | `/home/sandbox/.opencode/bin:/home/sandbox/.local/bin:/persist/.local/bin:/usr/local/bin:/usr/bin:/bin:/home/sandbox/node_modules/cline/bin` | Ensures installed binaries from various locations are available |
 | `USER_UID` | `${UID:-1000}`                                                                                                                               | User ID for the sandbox user (default: 1000)                    |
